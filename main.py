@@ -303,7 +303,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setTabEnabled(4, False)
         self.tabWidget.setTabEnabled(5, False)
         self.tabWidget.setTabEnabled(6, True)
-        self.tabWidget.setTabEnabled(7, True)
+        # self.tabWidget.setTabEnabled(7, True)
 
         self.tabWidget_stage.setTabEnabled(0, False)
         self.tabWidget_stage.setTabEnabled(1, False)
@@ -317,9 +317,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(4, False)
         self.toolBox.setItemEnabled(5, False)
         self.toolBox.setItemEnabled(6, True)
-        self.toolBox.setItemEnabled(7, True)
+        # self.toolBox.setItemEnabled(7, True)
  
-
+        self.tabWidget_2.setTabVisible(0, False) # скрывает ярлыки у tabWidget
+        self.tabWidget_2.setTabVisible(1, False)
+        self.tabWidget_2.setTabVisible(2, False)
     def closeEvent(self, event):
         # Создание бэкап DB при закрытии формы -main- по нажатию на крестик
         sender = my_win.sender()
@@ -976,10 +978,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def edit_etap(self):
         """редактирование жеребьевки этапов соревнования"""
-        my_win.tabWidget.setCurrentIndex(7)
+        my_win.tabWidget.setCurrentIndex(6)
+        my_win.tabWidget_2.setCurrentIndex(1)
         my_win.comboBox_first_group.clear()
         my_win.comboBox_second_group.clear()
-        my_win.tableView.hide()
+        # my_win.tableView.hide()
         my_win.widget.show()
 
     def open(self):
@@ -3186,8 +3189,9 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-    
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 280))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 482)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 285))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
@@ -3200,8 +3204,10 @@ def page():
         my_win.tableWidget.hide()
         my_win.widget.hide()
     elif tb == 1:  # -список участников-
+        my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 550))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         load_coach_to_combo()
@@ -3241,8 +3247,10 @@ def page():
         my_win.widget.hide()
         my_win.tableWidget.hide()
     elif tb == 2:  # -система-
+        my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 452))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.checkBox_repeat_regions.setChecked(False)
@@ -3439,6 +3447,7 @@ def page():
         my_win.tableWidget.hide()
     elif tb == 3:  # вкладка -результаты-       
         tab_list = ["Предварительный", "Полуфинальный", "Финальный"]
+        my_win.tabWidget_2.setCurrentIndex(0)
 
         tb_etap = my_win.tabWidget_stage.currentIndex()
         stage_current = tab_list[tb_etap]
@@ -3456,8 +3465,9 @@ def page():
         my_win.widget.hide()
         my_win.tableWidget.hide()
         my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 195, 1000, 575))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 195, 1000, 575))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 578)) # устанавливает tabWidget_2
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # tab_etap()
         if tb_etap == 0: # подвкладка -Группы-
@@ -3497,24 +3507,27 @@ def page():
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
         tab_etap()
     elif tb == 5: # вкладка -рейтинг-
+        my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 75, 841, 700))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        my_win.widget.hide()
+        # my_win.widget.hide()
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
         rejting_month = ["За текуший месяц", "За январь месяц"]
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
     elif tb == 6: # вкладка -дополнительно-
+        my_win.tabWidget_2.setCurrentIndex(2)
         my_win.groupBox_4.show()
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
+        # my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 520))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
@@ -3524,6 +3537,7 @@ def page():
         my_win.lineEdit_range_tours.hide()
         my_win.comboBox_first_group.setEnabled(False)
         my_win.comboBox_second_group.setEnabled(False)
+ 
         load_combo_etap_begunki()
     elif tb == 4: # парный разряд
         pass
