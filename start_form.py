@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\Alex\Competitions_TT_SQL\UI\start_form.ui'
+# Form implementation generated from reading ui file 'c:\Users\Alex\Competitions_TT_v4\UI\start_form.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -14,10 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(740, 237)
+        Form.resize(737, 237)
         Form.setAutoFillBackground(False)
         self.LinkButton = QtWidgets.QCommandLinkButton(Form)
-        self.LinkButton.setGeometry(QtCore.QRect(150, 53, 591, 31))
+        self.LinkButton.setGeometry(QtCore.QRect(150, 53, 571, 31))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(12)
@@ -26,7 +26,7 @@ class Ui_Form(object):
         self.LinkButton.setFont(font)
         self.LinkButton.setObjectName("LinkButton")
         self.comboBox = QtWidgets.QComboBox(Form)
-        self.comboBox.setGeometry(QtCore.QRect(153, 124, 580, 26))
+        self.comboBox.setGeometry(QtCore.QRect(153, 124, 571, 26))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(12)

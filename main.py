@@ -314,7 +314,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(1, False)
         self.toolBox.setItemEnabled(2, False)
         self.toolBox.setItemEnabled(3, False)
-        self.toolBox.setItemEnabled(4, False)
+        self.toolBox.setItemEnabled(4, True)
         self.toolBox.setItemEnabled(5, False)
         self.toolBox.setItemEnabled(6, True)
         # self.toolBox.setItemEnabled(7, True)
@@ -3540,7 +3540,8 @@ def page():
  
         load_combo_etap_begunki()
     elif tb == 4: # парный разряд
-        pass
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 578)) # устанавливает tabWidget_2
         # ======
     hide_show_columns(tb)
 
@@ -13475,13 +13476,14 @@ def score_in_setka(stage, place_3rd):
 def result_rank_group_in_choice(num_gr, player_rank_group, stage):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
-    tab = my_win.tabWidget.currentIndex()
+    # tab = my_win.tabWidget.currentIndex()
+    tab_etap = my_win.tabWidget_stage.currentIndex()
 
     chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
-        if tab == 3:
+        if tab_etap == 0:
             choice = chc.select().where(Choice.group == num_gr)
-        elif tab == 4:
+        elif tab_etap == 1:
             choice = chc.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))
         else:
             if num_gr == "Одна таблица":
@@ -13491,7 +13493,7 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
         count = len(choice)
         n = 0
         for ch in choice:
-            if tab == 3:
+            if tab_etap == 0:
                 for i in range(0, count):  # цикл по номерам посева в группе
                     # если есть совпадение, то место в списке
                     if ch.posev_group == player_rank_group[i][0]:
@@ -13499,7 +13501,7 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
                             # записывает в таблицу -Choice- места в группе
                             ch.mesto_group = player_rank_group[i][1]
                             ch.save()
-            elif tab == 4:
+            elif tab_etap == 1:
                 for i in range(0, count):  # цикл по номерам посева в группе
                     # если есть совпадение, то место в списке
                     if ch.posev_sf == player_rank_group[i][0]:
