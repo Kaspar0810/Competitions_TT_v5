@@ -636,7 +636,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     full_name_comp=full_name_comp, 
                     pdf_comp="",
                     short_name_comp=short_name_comp, 
-                    tab_enabled="Титул, Участники", 
+                    tab_enabled="Титул Участники", 
                     multiregion=titles.multiregion).save()
 
             # получение последней записи в таблице
@@ -1607,8 +1607,8 @@ def tab_enabled(id_title):
     my_win.tabWidget.setTabEnabled(3, False)
     my_win.tabWidget.setTabEnabled(4, False)
     my_win.tabWidget.setTabEnabled(5, False)
-    my_win.tabWidget.setTabEnabled(6, False)
-    my_win.tabWidget.setTabEnabled(7, True)
+    my_win.tabWidget.setTabEnabled(6, True)
+    # my_win.tabWidget.setTabEnabled(7, True)
 # включает вкладки записаные в Титул
     tab_str = title_new.tab_enabled
     tab_list = tab_str.split(" ")
@@ -3540,8 +3540,8 @@ def page():
  
         load_combo_etap_begunki()
     elif tb == 4: # парный разряд
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 578)) # устанавливает tabWidget_2
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 190))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 841, 578)) # устанавливает tabWidget_2
         # ======
     hide_show_columns(tb)
 
