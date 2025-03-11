@@ -1121,7 +1121,8 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         # === вставить  проверку DB ======      
         flag = check_delete_db()
-        if flag is None:
+        # if flag is None:
+        if flag == 1:
             return
         else:
             delete_db_copy(del_files_list=flag)
@@ -1129,7 +1130,8 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        if flag is not None:
+        # if flag is not None:
+        if flag != 1:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -3204,6 +3206,7 @@ def page():
         my_win.tableWidget.hide()
         my_win.widget.hide()
     elif tb == 1:  # -список участников-
+        my_win.checkBox_15.setChecked(False)
         my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 825)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
