@@ -314,11 +314,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(1, False)
         self.toolBox.setItemEnabled(2, False)
         self.toolBox.setItemEnabled(3, False)
-        self.toolBox.setItemEnabled(4, True)
+        self.toolBox.setItemEnabled(4, False)
         self.toolBox.setItemEnabled(5, False)
         self.toolBox.setItemEnabled(6, True)
         # self.toolBox.setItemEnabled(7, True)
-        self.checkBox_double.setChecked(True)
  
         self.tabWidget_2.setTabVisible(0, False) # скрывает ярлыки у tabWidget
         self.tabWidget_2.setTabVisible(1, False)
@@ -3181,9 +3180,9 @@ def tab_etap():
 def page_double():
     """Включает вкладку -пары- в зависимости от чекбокса на владке -система-"""
     if my_win.checkBox_double.isChecked():
-        my_win.tabWidget.setEnabled(4, True)
+        my_win.tabWidget.setTabEnabled(4, True)
     else: 
-        my_win.tabWidget.setEnabled(4, False)
+        my_win.tabWidget.setTabEnabled(4, False)
 
 
 def tool_page():
@@ -3518,6 +3517,13 @@ def page():
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
         tab_etap()
+    elif tb == 4: # парный разряд
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 578)) # устанавливает tabWidget_2
+        my_win.groupBox_match_double.setEnabled(True)
+        my_win.tabWidget_3.setTabEnabled(0, True)
+        text = my_win.tabWidget_3.tabText(1)
+        print(text)
     elif tb == 5: # вкладка -рейтинг-
         my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 825)
@@ -3551,11 +3557,7 @@ def page():
         my_win.comboBox_second_group.setEnabled(False)
  
         load_combo_etap_begunki()
-    elif tb == 4: # парный разряд
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 578)) # устанавливает tabWidget_2
-        my_win.groupBox_match_double.setEnabled(True)
-        my_win.tabWidget_3.setTabEnabled(0, True)
+   
         # ======
     hide_show_columns(tb)
 

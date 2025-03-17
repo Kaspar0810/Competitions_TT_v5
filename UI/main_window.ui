@@ -3061,8 +3061,26 @@
         <height>171</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>13</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="whatsThis">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(85, 170, 0);</string>
+      </property>
       <property name="currentIndex">
        <number>1</number>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -3179,14 +3197,14 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_11">
+      <widget class="QWidget" name="tab_12">
        <attribute name="title">
         <string>Результаты</string>
        </attribute>
        <widget class="QGroupBox" name="groupBox_match_double">
         <property name="geometry">
          <rect>
-          <x>3</x>
+          <x>0</x>
           <y>10</y>
           <width>810</width>
           <height>100</height>
@@ -4404,8 +4422,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4417,8 +4435,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5646,8 +5664,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6411,8 +6429,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6465,8 +6483,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6836,8 +6854,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>454</height>
       </rect>
      </property>
      <attribute name="label">
