@@ -318,6 +318,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(5, False)
         self.toolBox.setItemEnabled(6, True)
         # self.toolBox.setItemEnabled(7, True)
+        self.checkBox_double.setChecked(True)
  
         self.tabWidget_2.setTabVisible(0, False) # скрывает ярлыки у tabWidget
         self.tabWidget_2.setTabVisible(1, False)
@@ -3177,6 +3178,14 @@ def tab_etap():
     fill_table(player_list)
 
 
+def page_double():
+    """Включает вкладку -пары- в зависимости от чекбокса на владке -система-"""
+    if my_win.checkBox_double.isChecked():
+        my_win.tabWidget.setEnabled(4, True)
+    else: 
+        my_win.tabWidget.setEnabled(4, False)
+
+
 def tool_page():
     """Изменяет вкладку toolWidget в зависимости от вкладки tabWidget"""
     tb = my_win.toolBox.currentIndex()
@@ -3543,8 +3552,10 @@ def page():
  
         load_combo_etap_begunki()
     elif tb == 4: # парный разряд
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 190))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 841, 578)) # устанавливает tabWidget_2
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 578)) # устанавливает tabWidget_2
+        my_win.groupBox_match_double.setEnabled(True)
+        my_win.tabWidget_3.setTabEnabled(0, True)
         # ======
     hide_show_columns(tb)
 
@@ -16290,6 +16301,7 @@ my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по не�
 my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
+my_win.checkBox_double.stateChanged.connect(page_double)
 # my_win.checkBox_check_net.stateChanged.connect(button_check_on)
 # my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
