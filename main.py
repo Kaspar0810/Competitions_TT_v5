@@ -3186,6 +3186,7 @@ def tab_etap():
 
 def tab_double():
     """загружает в зависимости от выбранной вкладке"""
+    my_win.listWidget_double.clear()
     tab_double = my_win.tabWidget_3.currentIndex()
     if tab_double == 0:
         player = Player.select().where(Player.title_id == title_id())
@@ -3193,12 +3194,33 @@ def tab_double():
         if txt == "":
             my_win.textEdit.clear()
         txt = txt.upper()
-        player_list = player.select().where(Player.player ** f'{txt}%')  # like
-        if len(player_list) > 0:
-            fill_table(player_list)
+        pl = player.select().where(Player.player ** f'{txt}%')  # like
+        if len(pl) > 0:
+            for gamer in pl:
+                full_stroka = f"{gamer.player}, {str(gamer.city)}, {gamer.rank}"
+                my_win.listWidget_double.addItem(full_stroka) # заполняет лист виджет спортсменами
+            return
         else:
             my_win.textEdit.setText("Такого спортсмена нет!")
-
+# if tb == 6: # вкладка рейтинг
+#             # if cur_index == 0:
+#             #     player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+#             # else:
+#             #     player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
+#         else:
+#             for r_list in r_data:
+#                 p = r_list.select()
+#                 if r == 0 :
+#                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
+#                     p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+#                     if r == 0  and len(p) != 0:
+#                         for pl in p:
+#                             full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+#                             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+#                         return
+#                     elif r == 0:
+#                         r = 1
+#                         continue
 
 def page_double():
     """Включает вкладку -пары- в зависимости от чекбокса на владке -система-"""
