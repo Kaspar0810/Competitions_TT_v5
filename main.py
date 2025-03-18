@@ -1122,7 +1122,7 @@ class StartWindow(QMainWindow, Ui_Form):
         # === вставить  проверку DB ======      
         flag = check_delete_db()
         # if flag is None:
-        if flag == 1:
+        if flag == 1 or flag is None:
             return
         else:
             delete_db_copy(del_files_list=flag)
@@ -2295,6 +2295,7 @@ def fill_table(player_list):
     start = time.time()
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
+    
     player_selected = player_list.dicts().execute()
     
     row_count = len(player_selected)  # кол-во строк в таблице
@@ -2335,6 +2336,12 @@ def fill_table(player_list):
         else:
             num_columns = [0, 1, 4, 5, 6, 7, 8]
             model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
+    elif tb == 4:
+        tb_double = my_win.tabWidget_3.currentIndex()
+        if tb_double == 0:
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+        else:
+           model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях'])  
 
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -3175,6 +3182,22 @@ def tab_etap():
     my_win.label_16.setText(f'Всего в {etap_text}\n{count} игры')
     my_win.label_16.show()
     fill_table(player_list)
+
+
+def tab_double():
+    """загружает в зависимости от выбранной вкладке"""
+    tab_double = my_win.tabWidget_3.currentIndex()
+    if tab_double == 0:
+        player = Player.select().where(Player.title_id == title_id())
+        txt = my_win.lineEdit_pl1_double.text()
+        if txt == "":
+            my_win.textEdit.clear()
+        txt = txt.upper()
+        player_list = player.select().where(Player.player ** f'{txt}%')  # like
+        if len(player_list) > 0:
+            fill_table(player_list)
+        else:
+            my_win.textEdit.setText("Такого спортсмена нет!")
 
 
 def page_double():
@@ -5243,6 +5266,17 @@ def select_player_in_game():
                     else:
                         my_win.lineEdit_pl1_score_total.setFocus()
         my_win.tableView.selectRow(row_num)
+    elif tab == 4:
+        # tab_etap = my_win.tabWidget_stage.currentIndex()
+        tb_double = my_win.tabWidget_3.currentIndex()
+        fam = my_win.tableView.model().index(row_num, 1).data()
+        city = my_win.tableView.model().index(row_num, 4).data()
+        r =  my_win.tableView.model().index(row_num, 3).data()
+        if tb_double == 0:
+            my_win.lineEdit_pl1_double.clear()
+            my_win.lineEdit_pl1_double.setText(fam)
+            my_win.lineEdit_city_pl1.setText(city)
+            my_win.r_pl1.setText(r)
     elif tab == 7:
         player_id = my_win.tableView.model().index(row_num, 0).data()
         players = Player.select().where(Player.id == player_id).get()
@@ -16148,36 +16182,6 @@ my_win.lineEdit_pl2_s6.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s7.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s7.returnPressed.connect(focus)
 # ===== проверка правильность ввода цифр
-# ===== переводит фокус на поле ввода счета в партии вкладки -полуфиналы-
-# my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s1_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s2_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s2_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s3_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s3_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s4_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s4_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s5_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s5_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s6_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s6_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s7_pf.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s7_pf.returnPressed.connect(focus)
-# # ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
-# my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s2_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s2_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s3_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s3_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s6_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s6_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl1_s7_fin.returnPressed.connect(focus)
-# my_win.lineEdit_pl2_s7_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 my_win.lineEdit_num_game_fin.returnPressed.connect(filter_fin)
@@ -16199,6 +16203,7 @@ my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле п
 my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list)
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
+my_win.lineEdit_pl1_double.textChanged.connect(tab_double)
 
 my_win.comboBox_region.currentTextChanged.connect(find_city)
 # comboBox_family_city = QComboBox()
@@ -16212,6 +16217,7 @@ my_win.tableWidget.doubleClicked.connect(move_row_in_tablewidget)
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.tabWidget_stage.currentChanged.connect(tab_etap)
+my_win.tabWidget_3.currentChanged.connect(tab_double)
 
 my_win.toolBox.currentChanged.connect(tool_page)
 # ==================================

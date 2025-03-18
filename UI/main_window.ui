@@ -3077,7 +3077,7 @@
        <string notr="true">border-color: rgb(85, 170, 0);</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="usesScrollButtons">
        <bool>false</bool>
@@ -3086,22 +3086,6 @@
        <attribute name="title">
         <string>Списки</string>
        </attribute>
-       <widget class="QComboBox" name="comboBox_pl2">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>45</y>
-          <width>190</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="lineEdit_city_pl2">
         <property name="geometry">
          <rect>
@@ -3125,7 +3109,7 @@
        <widget class="QLabel" name="label_player_2">
         <property name="geometry">
          <rect>
-          <x>410</x>
+          <x>430</x>
           <y>21</y>
           <width>241</width>
           <height>21</height>
@@ -3138,7 +3122,7 @@
        <widget class="QLabel" name="label_player_1">
         <property name="geometry">
          <rect>
-          <x>11</x>
+          <x>30</x>
           <y>21</y>
           <width>177</width>
           <height>17</height>
@@ -3146,22 +3130,6 @@
         </property>
         <property name="text">
          <string>1-й игрок парного разряда</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox_pl1">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>45</y>
-          <width>190</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
         </property>
        </widget>
        <widget class="QLineEdit" name="r_pl1">
@@ -3194,6 +3162,39 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_double">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>45</y>
+          <width>181</width>
+          <height>23</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_double">
+        <property name="geometry">
+         <rect>
+          <x>420</x>
+          <y>45</y>
+          <width>181</width>
+          <height>23</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="Line" name="line_2">
+        <property name="geometry">
+         <rect>
+          <x>410</x>
+          <y>40</y>
+          <width>3</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
        </widget>
       </widget>
@@ -4415,7 +4416,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
