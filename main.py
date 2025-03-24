@@ -1122,7 +1122,7 @@ class StartWindow(QMainWindow, Ui_Form):
         # === вставить  проверку DB ======      
         flag = check_delete_db()
         # if flag is None:
-        if flag == 1 or flag is None:
+        if flag == 0:
             return
         else:
             delete_db_copy(del_files_list=flag)
@@ -1131,7 +1131,7 @@ class StartWindow(QMainWindow, Ui_Form):
     def open(self):
         flag = check_delete_db()
         # if flag is not None:
-        if flag != 1:
+        if flag != 0:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -1323,7 +1323,8 @@ def check_delete_db():
         if result == msgBox.Ok:
             flag = del_files_list
         else:
-            return
+            flag = 0
+            return flag
     else:
         flag = 1 # нет старых баз
     return flag
@@ -2979,7 +2980,12 @@ def check_age_player(znak, dr):
             if result == msgBox.Ok:
                 my_win.lineEdit_Family_name.setText("")               
                 return   
-           
+
+
+def dclick_in_listWidget_double():
+    """заносит пары игрок в tableWiev"""
+    pass
+
 
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
@@ -3202,6 +3208,19 @@ def tab_double():
             return
         else:
             my_win.textEdit.setText("Такого спортсмена нет!")
+        # ds = len(txt)
+        # sz = txt.index(",")
+        # sz1 = txt.index(",", sz + 1)
+        # sz2 = txt.index(",", sz1 + 1)
+        # fam_name = txt[0:sz]
+        # znak = fam_name.find(" ")
+        # fam = fam_name[:znak]
+        # fam = fam.upper()
+        # name = fam_name[znak + 1:]
+        # name = name.capitalize()
+        # r = txt[sz + 2:sz1]
+        # bd = txt[sz1 + 2:sz2]
+        # znak = bd.find(".")
 # if tb == 6: # вкладка рейтинг
 #             # if cur_index == 0:
 #             #     player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
@@ -3243,11 +3262,11 @@ def page():
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-    
-        my_win.resize(1110, 825)
+        my_win.resize(1110, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 482)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 457)) # (точка слева, точка сверху, ширина, высота)
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 285))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
         my_win.comboBox_referee.setEditable(True)
@@ -3261,11 +3280,11 @@ def page():
     elif tb == 1:  # -список участников-
         my_win.checkBox_15.setChecked(False)
         my_win.tabWidget_2.setCurrentIndex(0)
-        my_win.resize(1110, 825)
+        my_win.resize(1110, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 550))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         load_coach_to_combo()
         load_comboBox_filter()
         region()
@@ -3304,11 +3323,11 @@ def page():
         my_win.tableWidget.hide()
     elif tb == 2:  # -система-
         my_win.tabWidget_2.setCurrentIndex(0)
-        my_win.resize(1110, 825)
+        my_win.resize(1110, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 452))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 427))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         my_win.checkBox_repeat_regions.setChecked(False)
     
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
@@ -3494,10 +3513,10 @@ def page():
             my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_33.show()
             # сделать правильную сортировку по группам
-        if my_win.radioButton_gr_sort.isChecked():
-            player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_group, Choice.group)
-        elif my_win.radioButton_sf_sort.isChecked():
-            player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
+        # if my_win.radioButton_gr_sort.isChecked():
+        #     player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_group, Choice.group)
+        # elif my_win.radioButton_sf_sort.isChecked():
+        #     player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
         fill_table(player_list)
         my_win.widget.hide()
         my_win.tableWidget.hide()
@@ -3520,11 +3539,11 @@ def page():
         Button_view.clicked.connect(view)
         my_win.widget.hide()
         my_win.tableWidget.hide()
-        my_win.resize(1270, 825)
+        my_win.resize(1270, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 195, 1000, 575))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 578)) # устанавливает tabWidget_2
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 553)) # устанавливает tabWidget_2
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         # tab_etap()
         if tb_etap == 0: # подвкладка -Группы-
             stage = "Предварительный"
@@ -3563,19 +3582,21 @@ def page():
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
         tab_etap()
     elif tb == 4: # парный разряд
+        my_win.resize(1110, 800)
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 578)) # устанавливает tabWidget_2
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 553)) # устанавливает tabWidget_2
         my_win.groupBox_match_double.setEnabled(True)
         my_win.tabWidget_3.setTabEnabled(0, True)
         text = my_win.tabWidget_3.tabText(1)
         print(text)
     elif tb == 5: # вкладка -рейтинг-
         my_win.tabWidget_2.setCurrentIndex(0)
-        my_win.resize(1110, 825)
+        my_win.resize(1110, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 75, 841, 700))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 75, 841, 675))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         # my_win.widget.hide()
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
@@ -3585,12 +3606,12 @@ def page():
     elif tb == 6: # вкладка -дополнительно-
         my_win.tabWidget_2.setCurrentIndex(2)
         my_win.groupBox_4.show()
-        my_win.resize(1110, 825)
+        my_win.resize(1110, 800)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 520))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 495))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 737))
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
@@ -7268,7 +7289,8 @@ def choice_setka_automat(fin, flag, count_exit):
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
 
     n = 0  
-    end_posev = count_exit if flag != 3 else 1
+    # end_posev = count_exit if flag != 3 else 1
+    end_posev = count_exit
     while n < end_posev:  #  ======   НАЧАЛО ПОСЕВА   =========   добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
             real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
@@ -7291,6 +7313,7 @@ def choice_setka_automat(fin, flag, count_exit):
             real_all_player_in_final = len(choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums))))
         else: # финалы по сетке начиная со 2-ого и т.д.
             if stage_exit == "Предварительный": # откуда выход в финал
+                # if count_exit > 1 and flag != 3:
                 if count_exit > 1:
                     choice_posev = choice.select().where(Choice.mesto_group == nums[n])
                 else:
@@ -7300,8 +7323,9 @@ def choice_setka_automat(fin, flag, count_exit):
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
                 real_all_player_in_final = len(choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums))))
         count_player_in_final = len(choice_posev) # количество игроков в отдельном посева
-
-        if real_all_player_in_final != max_player:
+        # ищет свободные номера только в последнем посеве        
+        # if real_all_player_in_final != max_player:
+        if real_all_player_in_final != max_player and n == end_posev - 1:
             free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         full_posev.clear()
@@ -7384,7 +7408,7 @@ def choice_setka_automat(fin, flag, count_exit):
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
             # if del_num == 1 and n == count_exit - 1: 
-            if del_num == 1 and i == count_posev - 1:                    
+            if del_num == 1 and i == end_posev - 1:                    
                 for h in free_num:
                     sev.remove(h)
                 free_seats = len(free_num) # сколько свободных мест в сетке
@@ -15794,7 +15818,7 @@ def made_list_winners():
     my_win.Button_made_page_pdf.setEnabled(True)
     my_win.tableWidget.clear()
     players = Player.select().where(Player.title_id == title_id())
-    winners = players.select().where(Player.mesto < 4).order_by(Player.mesto)
+    winners = players.select().where((Player.mesto < 4) & (Player.bday != 0000-00-00)).order_by(Player.mesto)
     count = len(winners)
     if count == 0:
         return
@@ -16233,6 +16257,8 @@ my_win.comboBox_region.currentTextChanged.connect(find_city)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
+my_win.listWidget_double.itemDoubleClicked.connect(dclick_in_listWidget_double)
+
 # двойной клик по строке игроков в таблице -результаты-, -списки-
 my_win.tableView.doubleClicked.connect(select_player_in_game)
 my_win.tableWidget.doubleClicked.connect(move_row_in_tablewidget)
