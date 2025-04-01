@@ -1121,7 +1121,6 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         # === вставить  проверку DB ======      
         flag = check_delete_db()
-        # if flag is None:
         if flag == 0:
             return
         else:
@@ -1130,7 +1129,6 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        # if flag is not None:
         if flag != 0:
             delete_db_copy(del_files_list=flag)
         go_to()
@@ -4495,7 +4493,7 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
         st = "Одна таблица"
     system_table = system.label_string
     mp = system.max_player
-
+    mp = full_net_player(player_in_final=mp)
     if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
         game = 12
     elif system_table == "Сетка (-2) на 8 участников":
@@ -7325,6 +7323,7 @@ def choice_setka_automat(fin, flag, count_exit):
         count_player_in_final = len(choice_posev) # количество игроков в отдельном посева
         # ищет свободные номера только в последнем посеве        
         # if real_all_player_in_final != max_player:
+        max_player = full_net_player(player_in_final=max_player)
         if real_all_player_in_final != max_player and n == end_posev - 1:
             free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
@@ -9170,7 +9169,6 @@ def total_game_table(exit_stage, kpt, fin, pv):
             if etap_text == "Суперфинал":
                 player_in_final = kpt
                 player_in_final_full = full_net_player(player_in_final)
-                # player_in_final = kpt
             else:
                 player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
                 player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
@@ -9188,6 +9186,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
             str_setka = f"{gr_pf} {vt} по {kpt * 2} участника"
             total_gr = gr_pf
         else:
+            player_in_final_full = full_net_player(player_in_final)
             str_setka = f"{vt} {player_in_final_full} участников" # пишет в базе данных полное кол-во игроков сетке
             total_gr = 0
  
@@ -9610,7 +9609,6 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 94
         elif cur_index == 2:  # прогрессивная сетка
-            # full_net = full_net_player(kpt=player_in_final)
             full_net = full_net_player(player_in_final)
             tours = int(math.log2(full_net))
             all_game_net = full_net // 2 * tours # количество игр в сетке при полном составе
@@ -13226,11 +13224,11 @@ def setka_data(stage, posev_data):
     id_name = {}
     tds = []
     fam_name_city = []
-    # all_list = []
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
 
     mp = system.max_player
+    mp = full_net_player(player_in_final=mp)
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия'] # фамилия имя / город
