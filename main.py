@@ -963,7 +963,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         posev_data = player_choice_in_setka(fin)
                         player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                         load_combobox_filter_final()
-                        add_open_tab(tab_page="результаты")
+                        add_open_tab(tab_page="Результаты")
                         load_name_net_after_choice_for_wiev(fin)
                     my_win.tabWidget.setCurrentIndex(5) 
             else:
@@ -7298,9 +7298,12 @@ def choice_setka_automat(fin, flag, count_exit):
                 # == реальное число игроков в финале
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums)))
                 # == число игроков в конкретном посеве финала
-                if n == 0:
-                    choice_posev = choice.select().where(Choice.mesto_group == nums[n]) # если 1-й финал и 1-й посев то сортирует по группам 
+                if flag == 3:
+                    choice_posev = choice.select().where(Choice.mesto_group.in_(nums))
                 else:
+                    # if n == 0:
+                    #     choice_posev = choice.select().where(Choice.mesto_group == nums[n]) # если 1-й финал и 1-й посев то сортирует по группам 
+                    # else:
                     choice_posev = choice.select().where(Choice.mesto_group == nums[n])          
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 real_all_player_in_final = len(choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums))))
@@ -7311,11 +7314,13 @@ def choice_setka_automat(fin, flag, count_exit):
             real_all_player_in_final = len(choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums))))
         else: # финалы по сетке начиная со 2-ого и т.д.
             if stage_exit == "Предварительный": # откуда выход в финал
-                # if count_exit > 1 and flag != 3:
-                if count_exit > 1:
-                    choice_posev = choice.select().where(Choice.mesto_group == nums[n])
+                if flag == 3:
+                   choice_posev = choice.select().where(Choice.mesto_group == nums[n]) 
                 else:
-                    choice_posev = choice.select().where(Choice.mesto_group.in_(nums))
+                    if count_exit > 1:
+                        choice_posev = choice.select().where(Choice.mesto_group == nums[n])
+                    else:
+                        choice_posev = choice.select().where(Choice.mesto_group.in_(nums))
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums))) # реальное число игроков в сетке
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
@@ -7364,8 +7369,11 @@ def choice_setka_automat(fin, flag, count_exit):
             full_posev.sort(key=lambda k: k[7]) # сортировка списка участников по месту в 1-ом финале
         elif count_exit == 1 or fin == "Одна таблица":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
-        elif count_exit > 1 and fin == "1-й финал":
-            full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+        elif fin == "1-й финал":
+            if count_exit > 1:
+                full_posev.sort(key=lambda k: (k[7], k[3])) # сортировка списка участников сначала по месту в группе а потом по группач
+            else:
+                full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         elif count_exit != 1 or fin != "1-й финал":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
    
@@ -7547,9 +7555,9 @@ def choice_setka_automat(fin, flag, count_exit):
                                     player_list_tmp.clear()
                                     pl_id_list_tmp.clear()
                                     q += 1
-                                if fin != "Суперфинал":
-                                    pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                    player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                # if fin != "Суперфинал":
+                                #     pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                #     player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 for i in range(0, count_posev):
                                     n_poseva = posev[i] 
                                     count_sev = len(n_poseva)
@@ -11613,7 +11621,7 @@ def setka_8_full_made(fin):
     #===============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 4.8 * cm, 1.5 * cm, 0.4 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
+    color_mesta(data, first_mesto, table, fin) # раскрашивает места участников красным цветом
     t = Table(data, cw, 40 * [0.6 * cm])
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
@@ -14652,19 +14660,22 @@ def draw_num_lost_2(row_n, row_step, col_n, revers_number, number_of_game, playe
             number_of_game += 1
 
 
-def color_mesta(data, first_mesto, table):
+def color_mesta(data, first_mesto, table, fin):
     """окрашивает места в красный цвет"""
     b = 0
     style_color = []
-    system = System.select().where(System.title_id == title_id())
-    for i in system:
-        stage = i.stage
-        type_table = i.type_table
-        if stage == "1-й финал" and type_table == "сетка":
-            flag = i.no_game
-            break
-        else:
-            flag = ""
+    id_system = system_id(stage=fin)
+    system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
+    flag = system.no_game
+
+    # for i in system:
+    #     stage = i.stage
+    #     type_table = i.type_table
+    #     if stage == "1-й финал" and type_table == "сетка":
+    #         flag = i.no_game
+    #         break
+    #     else:
+    #         flag = ""
 
     ml = [] # столбец, ряд -1 ого места, ряд 2-ого места + 1, шаг между местами
     f = 0 # количество столбцов
