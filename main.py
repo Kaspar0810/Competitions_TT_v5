@@ -3189,6 +3189,28 @@ def tab_etap():
     fill_table(player_list)
 
 
+def tab_result():
+    """включает от вкладки надпись этапа"""
+    tb = my_win.tabWidget_stage.currentIndex()
+    if tb == 0:
+        txt = "Предварительный этап"
+        txt_tab = "ГР"
+        my_win.tabWidget_stage.setTabText(1, "пф")
+        my_win.tabWidget_stage.setTabText(2, "фин")
+    elif tb == 1:
+        txt = "Полуфинальный этап" 
+        txt_tab = "ПФ"
+        my_win.tabWidget_stage.setTabText(0, "гр")
+        my_win.tabWidget_stage.setTabText(2, "фин")
+    elif tb == 2:
+        txt = "Финальный этап" 
+        txt_tab = "ФИН"
+        my_win.tabWidget_stage.setTabText(0, "гр")
+        my_win.tabWidget_stage.setTabText(1, "пф")   
+    my_win.tabWidget_stage.setTabText(tb, txt_tab)
+    my_win.label_result.setText(txt)
+
+
 def tab_double():
     """загружает в зависимости от выбранной вкладке"""
     my_win.listWidget_double.clear()
@@ -3539,11 +3561,11 @@ def page():
         my_win.widget.hide()
         my_win.tableWidget.hide()
         my_win.resize(1270, 750)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 195, 1000, 575))
+
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 502)) # устанавливает tabWidget_2
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
-        # tab_etap()
+ 
         if tb_etap == 0: # подвкладка -Группы-
             stage = "Предварительный"
             load_combobox_filter_group()
@@ -16276,6 +16298,7 @@ my_win.tableWidget.doubleClicked.connect(move_row_in_tablewidget)
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.tabWidget_stage.currentChanged.connect(tab_etap)
 my_win.tabWidget_3.currentChanged.connect(tab_double)
+my_win.tabWidget_stage.currentChanged.connect(tab_result)
 
 my_win.toolBox.currentChanged.connect(tool_page)
 # ==================================

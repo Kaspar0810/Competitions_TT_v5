@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\Alex_SSHOR13\Competitions_TT_v4\UI\main_window.ui'
+# Form implementation generated from reading ui file 'c:\Users\Alex\Competitions_TT_v4\UI\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -1057,7 +1057,7 @@ class Ui_MainWindow(object):
         self.Button_Ok.setGeometry(QtCore.QRect(730, 36, 71, 61))
         self.Button_Ok.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Alex_SSHOR13\\Competitions_TT_v4\\UI\\../icons/Ok.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Alex\\Competitions_TT_v4\\UI\\../icons/Ok.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.Button_Ok.setIcon(icon)
         self.Button_Ok.setIconSize(QtCore.QSize(48, 48))
         self.Button_Ok.setFlat(True)
@@ -1956,7 +1956,7 @@ class Ui_MainWindow(object):
         self.page.setObjectName("page")
         self.toolBox.addItem(self.page, "")
         self.page_1 = QtWidgets.QWidget()
-        self.page_1.setGeometry(QtCore.QRect(0, 0, 239, 434))
+        self.page_1.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_1.setObjectName("page_1")
         self.label_dolg_R = QtWidgets.QLabel(self.page_1)
         self.label_dolg_R.setGeometry(QtCore.QRect(10, 360, 221, 21))
@@ -2285,7 +2285,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_28)
         self.toolBox.addItem(self.page_1, "")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 239, 434))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_2.setObjectName("page_2")
         self.label_18 = QtWidgets.QLabel(self.page_2)
         self.label_18.setGeometry(QtCore.QRect(12, 0, 211, 16))
@@ -3731,7 +3731,7 @@ class Ui_MainWindow(object):
         self.label_73.setText(_translate("MainWindow", "по игроку"))
         self.Button_filter_gr.setText(_translate("MainWindow", "Применить"))
         self.Button_reset_filter_gr.setText(_translate("MainWindow", "Сброс"))
-        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_11), _translate("MainWindow", "ГР"))
+        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_11), _translate("MainWindow", "гр"))
         self.groupBox_filter_group_semifinal_2.setTitle(_translate("MainWindow", "Фильтр"))
         self.label_42.setText(_translate("MainWindow", "по полуфиналам"))
         self.label_17.setText(_translate("MainWindow", "по группам"))
@@ -3739,7 +3739,7 @@ class Ui_MainWindow(object):
         self.label_65.setText(_translate("MainWindow", "по игроку"))
         self.Button_filter_sf.setText(_translate("MainWindow", "Применить"))
         self.Button_reset_filter_sf.setText(_translate("MainWindow", "Сброс"))
-        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_21), _translate("MainWindow", "ПФ"))
+        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_21), _translate("MainWindow", "пф"))
         self.groupBox_filter_group_3.setTitle(_translate("MainWindow", "Фильтр"))
         self.label_38.setText(_translate("MainWindow", "по финалам"))
         self.label_40.setText(_translate("MainWindow", "по результатам"))
@@ -3748,7 +3748,7 @@ class Ui_MainWindow(object):
         self.label_61.setText(_translate("MainWindow", "<html><head/><body><p>туры</p></body></html>"))
         self.Button_filter_fin.setText(_translate("MainWindow", "Применить"))
         self.Button_reset_filter_fin.setText(_translate("MainWindow", "Сброс"))
-        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_31), _translate("MainWindow", "ФИН"))
+        self.tabWidget_stage.setTabText(self.tabWidget_stage.indexOf(self.tab_31), _translate("MainWindow", "фин"))
         self.checkBox_no_play_3.setText(_translate("MainWindow", "за 3 место"))
         self.label_124.setText(_translate("MainWindow", "Встречи не разигрываются"))
         self.Button_check_net.setText(_translate("MainWindow", "Проверка  сетки"))

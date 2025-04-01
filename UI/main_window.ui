@@ -4560,8 +4560,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5173,8 +5173,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5745,7 +5745,7 @@
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
-        <string>ГР</string>
+        <string>гр</string>
        </attribute>
        <widget class="QGroupBox" name="groupBox_filter_group_4">
         <property name="geometry">
@@ -5895,7 +5895,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>ПФ</string>
+        <string>пф</string>
        </attribute>
        <widget class="QGroupBox" name="groupBox_filter_group_semifinal_2">
         <property name="geometry">
@@ -6069,7 +6069,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>ФИН</string>
+        <string>фин</string>
        </attribute>
        <widget class="QGroupBox" name="groupBox_filter_group_3">
         <property name="geometry">
