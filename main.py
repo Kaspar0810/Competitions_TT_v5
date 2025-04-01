@@ -3261,11 +3261,11 @@ def page():
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-    
-        my_win.resize(1110, 780)
+        my_win.resize(1110, 760)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 457)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 411)) # (точка слева, точка сверху, ширина, высота)
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 285))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
         my_win.comboBox_referee.setEditable(True)
@@ -3279,11 +3279,11 @@ def page():
     elif tb == 1:  # -список участников-
         my_win.checkBox_15.setChecked(False)
         my_win.tabWidget_2.setCurrentIndex(0)
-        my_win.resize(1110, 780)
+        my_win.resize(1110, 760)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 495))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 473))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         load_coach_to_combo()
         load_comboBox_filter()
         region()
@@ -3322,11 +3322,11 @@ def page():
         my_win.tableWidget.hide()
     elif tb == 2:  # -система-
         my_win.tabWidget_2.setCurrentIndex(0)
-        my_win.resize(1110, 800)
+        my_win.resize(1110, 760)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 427))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 384))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         my_win.checkBox_repeat_regions.setChecked(False)
     
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
@@ -3538,11 +3538,11 @@ def page():
         Button_view.clicked.connect(view)
         my_win.widget.hide()
         my_win.tableWidget.hide()
-        my_win.resize(1270, 800)
+        my_win.resize(1270, 780)
         # my_win.tableView.setGeometry(QtCore.QRect(260, 195, 1000, 575))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 190))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 553)) # устанавливает tabWidget_2
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 195, 1000, 502)) # устанавливает tabWidget_2
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         # tab_etap()
         if tb_etap == 0: # подвкладка -Группы-
             stage = "Предварительный"
@@ -3582,7 +3582,7 @@ def page():
         tab_etap()
     elif tb == 4: # парный разряд
         my_win.resize(1110, 800)
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 525)) # устанавливает tabWidget_2
         my_win.groupBox_match_double.setEnabled(True)
@@ -3595,7 +3595,7 @@ def page():
         # my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 75, 841, 650))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         # my_win.widget.hide()
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
@@ -3609,8 +3609,8 @@ def page():
         # my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 495))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 707))
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 450))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
