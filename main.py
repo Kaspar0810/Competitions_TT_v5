@@ -7822,7 +7822,24 @@ def setka_choice_number(fin, count_exit):
                 posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
                 player_net = 32
         elif count_exit == 3:
-            pass
+            if type_setka == "Сетка (с розыгрышем всех мест) на 8 участников" or type_setka == "Сетка (-2) на 8 участников":
+                posev_1 = [[1, 8]]
+                posev_2 = [[4, 5]]
+                posev_3 = [[3, 6]]
+                # posev_4 = [[2, 7]]
+                player_net = 8
+            elif type_setka == "Сетка (с розыгрышем всех мест) на 16 участников" or type_setka == "Сетка (-2) на 16 участников":
+                posev_1 = [[1, 16], [8, 9]]
+                posev_2 = [[4, 5, 12, 13]]
+                posev_3 = [[3, 6, 11, 14]]
+                # posev_4 = [[2, 7, 10, 15]]
+                player_net = 16
+            elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников" or type_setka == "Сетка (-2) на 32 участников":
+                posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
+                posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
+                posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
+                # posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]] 
+                player_net = 32
         elif count_exit == 4:
             if type_setka == "Сетка (с розыгрышем всех мест) на 8 участников" or type_setka == "Сетка (-2) на 8 участников":
                 posev_1 = [[1, 8]]
@@ -8798,7 +8815,6 @@ def change_player_between_group_after_draw():
                 query.execute()
                 n += 1
         # =====================
-    # player_in_table_group_and_write_Game_list_Result(stage) 
     if flag_change == 1:
         player_in_setka_and_write_Game_list_Result(gr, posev_list, full_name_list)
     else:
@@ -9066,7 +9082,7 @@ def hide_show_columns(tb):
         my_win.tableView.showColumn(9) # тренеры
         my_win.tableView.showColumn(10) # место
         my_win.tableView.showColumn(11) # место в группе
-    elif tb == 3 or tb == 4 or tb == 5:
+    elif tb == 3:
         my_win.tableView.showColumn(2)
         my_win.tableView.showColumn(3) # регион
         my_win.tableView.showColumn(4) # игрок 1
@@ -9121,7 +9137,6 @@ def etap_made(stage):
     player_in_final = []
     # ====
     systems = System.select().where(System.title_id == id_title)
-    # for k in system:
     for k in systems:
         stage = k.stage
         pl_final = k.max_player
@@ -10901,7 +10916,6 @@ def merdge_pdf_files():
     with contextlib.ExitStack() as stack:
         files = [stack.enter_context(open(pdf, 'rb')) for pdf in pdf_files_list]
         for f in files:
-            # sign_referee_on_page(f)
             pdf_merger.append(f)
         os.chdir("..")
         catalog = 2
@@ -15792,73 +15806,79 @@ def made_list_regions():
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
 
 
-def made_list_players_on_alf():
+def made_list_players_for_pdf_file():
     """создание списка по алфавиту"""
     from reportlab.platypus import Table
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
     tit = Title.get(Title.id == title_id())
-    player_list_x = Player.select().where(Player.title_id == title_id()).order_by(Player.player)
-    player_list = player_list_x.select().where(Player.player != "x")
-    short_name = tit.short_name_comp
-    gamer = tit.gamer
-    count = len(player_list)  # количество записей в базе
-    kp = count + 1
-    n = 0
-    for l in player_list:
-        n += 1
-        p = l.player
-        b = l.bday
-        b = format_date_for_view(str_date=b)
-        r = l.rank
-        c = l.city
-        g = l.region
-        z = l.razryad
-        coach_id = l.coach_id
-        t = coach_id.coach
-        m = l.mesto
-        t = chop_line(t)
-        data = [n, p, b, r, c, g, z, t, m]
+    for k in range(0, 2):
+        if k == 0:
+            player_list_x = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)
+        else:
+            player_list_x = Player.select().where(Player.title_id == title_id()).order_by(Player.player)
+        player_list = player_list_x.select().where(Player.player != "x")
+        short_name = tit.short_name_comp
+        gamer = tit.gamer
+        count = len(player_list)  # количество записей в базе
+        kp = count + 1
+        n = 0
+        for l in player_list:
+            n += 1
+            p = l.player
+            b = l.bday
+            b = format_date_for_view(str_date=b)
+            r = l.rank
+            c = l.city
+            g = l.region
+            z = l.razryad
+            coach_id = l.coach_id
+            t = coach_id.coach
+            m = l.mesto
+            t = chop_line(t)
+            data = [n, p, b, r, c, g, z, t, m]
 
-        elements.append(data)
-    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
-                        "Место"])
-    t = Table(elements,
-              colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
-              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
-    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-                            ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
-                           # Использую импортированный шрифта размер
-                           ('FONTSIZE', (0, 0), (-1, -1), 7),
-                           # межстрочный верхний инервал
-                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-                           # межстрочный нижний инервал
-                           ('TOPPADDING', (0, 0), (-1, -1), 1),
-                           # вериткальное выравнивание в ячейке заголовка
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                           # горизонтальное выравнивание в ячейке
-                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
-                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
-                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
-                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
-                           # цвет и толщину внутренних линий
-                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
-                           # внешние границы таблицы
-                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
-                           ]))
+            elements.append(data)
+        elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
+                            "Место"])
+        t = Table(elements,
+                colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
+                rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+        t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                                ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                            # Использую импортированный шрифта размер
+                            ('FONTSIZE', (0, 0), (-1, -1), 7),
+                            # межстрочный верхний инервал
+                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                            # межстрочный нижний инервал
+                            ('TOPPADDING', (0, 0), (-1, -1), 1),
+                            # вериткальное выравнивание в ячейке заголовка
+                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                            # горизонтальное выравнивание в ячейке
+                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                            ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                            ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                            # цвет и толщину внутренних линий
+                            ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                            # внешние границы таблицы
+                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                            ]))
 
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-            firstLineIndent=-20, textColor="green")  # стиль параграфа
-    h3.spaceAfter = 10  # промежуток после заголовка
-    story.append(Paragraph(f'Список участников. {gamer}', h3))
-    story.append(t)
-
-    doc = SimpleDocTemplate(f"{short_name}_player_list_alf.pdf", pagesize=A4)
-    catalog = 1
-    change_dir(catalog)
-    doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    os.chdir("..")
+        h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+                firstLineIndent=-20, textColor="green")  # стиль параграфа
+        h3.spaceAfter = 10  # промежуток после заголовка
+        story.append(Paragraph(f'Список участников. {gamer}', h3))
+        story.append(t)
+        if k == 0:
+            doc = SimpleDocTemplate(f"{short_name}_player_list_mesto.pdf", pagesize=A4)
+        else:
+            doc = SimpleDocTemplate(f"{short_name}_player_list_alf.pdf", pagesize=A4)
+        catalog = 1
+        change_dir(catalog)
+        doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+        os.chdir("..")
 
 
 def made_list_winners():
@@ -16463,7 +16483,7 @@ my_win.tableWidget.cellClicked.connect(button_move_enabled)
 my_win.Button_list_referee.clicked.connect(made_list_GSK)
 my_win.Button_list_regions.clicked.connect(made_list_regions)
 my_win.Button_list_winner.clicked.connect(made_list_winners)
-my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
+my_win.Button_players_on_pdf_file.clicked.connect(made_list_players_for_pdf_file)
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
