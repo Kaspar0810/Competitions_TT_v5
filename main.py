@@ -934,7 +934,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                     return
                             add_open_tab(tab_page="Результаты")
                         else:
-                            my_win.tabWidget.setCurrentIndex(5) 
+                            my_win.tabWidget.setCurrentIndex(3) 
                             clear_db_before_choice_final(fin)
                             posev_data = player_choice_in_setka(fin)
                             player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
@@ -944,6 +944,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                             my_win.statusbar.showMessage(
                                             f"Жеребъевка {fin} завершена успешно", 5000)
+                            check_choice_net(fin) # == проверка жеребьевки сетки на 1-ю встречу игроков одного региона или одного тренера
                     else:
                         return
                 else:
@@ -3159,18 +3160,18 @@ def tab_etap():
     results = Result.select().where(Result.title_id == title_id())    
     systems = System.select().where(System.title_id == title_id())
     tab_result()
-    for i in systems:
-        etap = i.stage      
-        if etap == "Предварительный":
-            my_win.tabWidget_stage.setTabEnabled(0, True)
-            tab_enabled_list.append(0)
-        elif etap in sf_list:
-            my_win.tabWidget_stage.setTabEnabled(1, True)
-            tab_enabled_list.append(1)
-        elif etap != "Предварительный" and etap not in sf_list:
-            my_win.tabWidget_stage.setTabEnabled(2, True)
-            tab_enabled_list.append(2)
-            break
+    # for i in systems:
+    #     etap = i.stage      
+    #     if etap == "Предварительный":
+    #         my_win.tabWidget_stage.setTabEnabled(0, True)
+    #         tab_enabled_list.append(0)
+    #     elif etap in sf_list:
+    #         my_win.tabWidget_stage.setTabEnabled(1, True)
+    #         tab_enabled_list.append(1)
+    #     elif etap != "Предварительный" and etap not in sf_list:
+    #         my_win.tabWidget_stage.setTabEnabled(2, True)
+    #         tab_enabled_list.append(2)
+    #         break
     if tab_etap == 0:
         player_list = results.select().where(Result.system_stage == "Предварительный")
         etap_text = "групповом этапе"
@@ -3354,8 +3355,10 @@ def page():
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
 
-        player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
-        count = len(player_list)
+        # player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
+        # count = len(player_list)
+        player_list_main = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
+        count = len(player_list_main)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
         label_playing_count() # пишет сколько игр сыграно в каждом этапе
@@ -3532,15 +3535,13 @@ def page():
             my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_33.show()
             # сделать правильную сортировку по группам
-        # if my_win.radioButton_gr_sort.isChecked():
-        #     player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_group, Choice.group)
-        # elif my_win.radioButton_sf_sort.isChecked():
-        #     player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
+        player_list = Choice.select().where(Choice.title_id == title_id())
         fill_table(player_list)
         my_win.widget.hide()
         my_win.tableWidget.hide()
     elif tb == 3:  # вкладка -результаты-       
-        # tab_list = ["Предварительный", "Полуфинальный", "Финальный"]
+        for l in range (0, 3): # сначала выключает вкладки этапов
+            my_win.tabWidget_stage.setTabEnabled(l, False)
         pf_list = ["1-й полуфинал", "2-й полуфинал"]
         my_win.tabWidget_2.setCurrentIndex(0)
         # выключить вкладки этапы если еще не было жеребьевки
@@ -3563,15 +3564,19 @@ def page():
         tb_etap = my_win.tabWidget_stage.currentIndex()
 
         Button_view = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        Button_view.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+        Button_view.resize(100, 80) # размеры кнопки (длина 120, ширина 50)
         Button_view.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
         Button_view.setIcon(QtGui.QIcon(joined_path))
-        Button_view.setIconSize(QtCore.QSize(48,64))
+        Button_view.setIconSize(QtCore.QSize(96, 128))
         Button_view.setFlat(True)
-
         Button_view.show()
         Button_view.clicked.connect(view)
+        Label_view = QLabel(my_win.tabWidget)
+        Label_view.resize(150, 80) # размеры кнопки (длина 120, ширина 50)
+        Label_view.move(880, 120) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        Label_view.setText("Просмотр")
+        Label_view.show()
         my_win.widget.hide()
         my_win.tableWidget.hide()
         my_win.resize(1270, 750)
@@ -3623,8 +3628,6 @@ def page():
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 502)) # устанавливает tabWidget_2
         my_win.groupBox_match_double.setEnabled(True)
         my_win.tabWidget_3.setTabEnabled(0, True)
-        text = my_win.tabWidget_3.tabText(1)
-        print(text)
     elif tb == 5: # вкладка -рейтинг-
         my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 750)
@@ -3642,7 +3645,6 @@ def page():
         my_win.tabWidget_2.setCurrentIndex(2)
         my_win.groupBox_4.show()
         my_win.resize(1110, 750)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 450))
@@ -3928,6 +3930,7 @@ def list_player_pdf(player_list):
 
 def ReturnCode():
     pass
+
 
 def exit_comp(flag):   
     """нажата кнопка -выход- и резервное копирование db"""
@@ -14373,7 +14376,7 @@ def player_choice_in_setka(fin):
  
     flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
     posev = choice_setka_automat(fin, flag, count_exit)
-
+   
     posev_data = []
     for key in posev.keys():
         posev_data.append({'посев': key, 'фамилия': posev[key]})  
@@ -16107,14 +16110,13 @@ def button_check_on():
         my_win.Button_check_net.setEnabled(False)
 
 
-def check_choice_net():
+def check_choice_net(fin):
     """Проверка после жеребьевки сетки на 1-ю встречи одних регионов или одинаковых тренеров"""
     msgBox = QMessageBox
     region_list = []
     coach_list = []
     coach_list_tmp = []
-    stage = my_win.tableView.model().index(0, 2).data() 
-    id_system = system_id(stage)
+    id_system = system_id(stage=fin)
     gamelist_fin = Game_list.select().where(Game_list.system_id == id_system).order_by(Game_list.rank_num_player)
     c = 0
     g = 2
