@@ -3152,13 +3152,13 @@ def tab():
 
 
 def tab_etap():
-    """Вкдючает или выключает вкладки на странице -Результаты-"""
+    """Включает или выключает вкладки на странице -Результаты-"""
     sf_list = ["1-й полуфинал", "2-й полуфинал"]
     tab_enabled_list = []
     tab_etap = my_win.tabWidget_stage.currentIndex()
     results = Result.select().where(Result.title_id == title_id())    
     systems = System.select().where(System.title_id == title_id())
-
+    tab_result()
     for i in systems:
         etap = i.stage      
         if etap == "Предварительный":
@@ -3173,7 +3173,7 @@ def tab_etap():
             break
     if tab_etap == 0:
         player_list = results.select().where(Result.system_stage == "Предварительный")
-        etap_text = "предварительном этапе"
+        etap_text = "групповом этапе"
         load_combobox_filter_group()
     elif tab_etap == 1:        
         player_list = results.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
@@ -3284,7 +3284,6 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-    
         my_win.resize(1110, 750)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 290, 841, 411)) # (точка слева, точка сверху, ширина, высота)
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 285))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
@@ -3302,7 +3301,6 @@ def page():
         my_win.checkBox_15.setChecked(False)
         my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 750)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 225, 841, 473))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
@@ -3542,11 +3540,27 @@ def page():
         my_win.widget.hide()
         my_win.tableWidget.hide()
     elif tb == 3:  # вкладка -результаты-       
-        tab_list = ["Предварительный", "Полуфинальный", "Финальный"]
+        # tab_list = ["Предварительный", "Полуфинальный", "Финальный"]
+        pf_list = ["1-й полуфинал", "2-й полуфинал"]
         my_win.tabWidget_2.setCurrentIndex(0)
+        # выключить вкладки этапы если еще не было жеребьевки
+        choice_etap = []
+        for k in sf:
+            ch_flag = k.choice_flag
+            if ch_flag == 1:
+                choice_etap.append(k.stage)
+        for m in choice_etap:
+            if m == "Предварительный":
+                my_win.tabWidget_stage.setTabEnabled(0, True)
+                index = 0
+            elif m in pf_list:
+                my_win.tabWidget_stage.setTabEnabled(1, True)
+            else:
+                my_win.tabWidget_stage.setTabEnabled(2, True)
+                index = 2
 
+        my_win.tabWidget_stage.setCurrentIndex(index)
         tb_etap = my_win.tabWidget_stage.currentIndex()
-        stage_current = tab_list[tb_etap]
 
         Button_view = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
         Button_view.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
@@ -3586,7 +3600,7 @@ def page():
                 i.setChecked(True)
                 break
 
-        my_win.label_result.setText(f"{stage_current} этап")
+        # my_win.label_result.setText(f"{stage_current} этап")
         game_visible = sys_etap.visible_game
         my_win.checkBox_4.setChecked(game_visible)
         my_win.checkBox_7.setEnabled(False)
@@ -16298,7 +16312,7 @@ my_win.tableWidget.doubleClicked.connect(move_row_in_tablewidget)
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.tabWidget_stage.currentChanged.connect(tab_etap)
 my_win.tabWidget_3.currentChanged.connect(tab_double)
-my_win.tabWidget_stage.currentChanged.connect(tab_result)
+# my_win.tabWidget_stage.currentChanged.connect(tab_result)
 
 my_win.toolBox.currentChanged.connect(tool_page)
 # ==================================
