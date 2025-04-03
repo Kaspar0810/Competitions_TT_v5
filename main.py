@@ -5347,7 +5347,6 @@ def select_player_in_game():
                         my_win.lineEdit_pl1_score_total.setFocus()
         my_win.tableView.selectRow(row_num)
     elif tab == 4:
-        # tab_etap = my_win.tabWidget_stage.currentIndex()
         tb_double = my_win.tabWidget_3.currentIndex()
         fam = my_win.tableView.model().index(row_num, 1).data()
         city = my_win.tableView.model().index(row_num, 4).data()
@@ -5373,6 +5372,8 @@ def delete_player():
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный").get()
+    system_id = sys.id # id системы -Предварительного этапа-
     idx = my_win.tableView.currentIndex() # определиние номера строки
     row_num = idx.row()
 
@@ -5397,9 +5398,23 @@ def delete_player():
         system_flag = ready_system() # проверка была создана система
         if system_flag is True:
             count = len(system)
-            for sys in system:
-                athlet = sys.total_athletes
-                System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
+        # ============ корректрует запись в таблице -system- после удаления игрока
+            athlet = sys.total_athletes
+            kg = sys.total_group
+            e1 = athlet % int(kg)
+            # если количество участников равно делится на группы (кол-во групп)
+            p = athlet // int(kg)
+            g1 = int(kg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
+            g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
+            if e1 == 0:  # то в группах равное количество человек -e1-
+                stroka_kol_group = f"{kg} группы по {str(p)} чел."
+            else:
+                stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
+            System.update(total_athletes=athlet - 1, label_string=stroka_kol_group).where(System.title_id == title_id()).execute()
+
+            # for sys in system:
+            #     athlet = sys.total_athletes
+            #     System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
 
             fin = "Предварительный"
             check_flag = check_choice(fin)
@@ -5408,12 +5423,12 @@ def delete_player():
                                                 f" {player_del} город {player_city_del}\n"
                                                 "будет удален(а) из посева.",
                                     msgBox.Ok)
-                sys = system.select().where(System.stage == "Предварительный").get()
-                system_id = sys.id # id системы -Предварительного этапа-
+                # sys = system.select().where(System.stage == "Предварительный").get()
+                # system_id = sys.id # id системы -Предварительного этапа-
                 
                 choices = Choice.delete().where(Choice.player_choice_id == player_id)
                 choices.execute()
-                game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
+                game_lists = game_list.select().where(Game_list.player_group_id == player_id).get()
                 posev = game_lists.rank_num_player
                 number_group = game_lists.number_group
                 # === изменяет номера посева, если удаляемый игрок не в последний посев ==
@@ -5455,6 +5470,7 @@ def delete_player():
                     new_tour = f"{p1}-{p2}"
                     res = Result.update(tours=new_tour).where(Result.id == k)
                     res.execute()
+                
         else: # записывает в таблицу -Удаленные-
             year = birthday[6:] 
             monh  = birthday[3:5]
