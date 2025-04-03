@@ -7112,7 +7112,7 @@ def choice_gr_automat():
         posev[f"{b}_посев"] = gr_region
         posev_group.clear()
    
-    pl_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
+    pl_choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.family != "X")).order_by(Choice.rank.desc())
     m = 1  # начальное число посева
     p = 0
     number_poseva = 0  # общий счетчик посева игроков
@@ -9291,12 +9291,15 @@ def total_game_table(exit_stage, kpt, fin, pv):
  
         stroka_kol_game = f"{total_games} игр"
         # заполняет max_player в зависиости от кол игроков
-        if type_table == "круг": # если финал по кругу
-            m_pl = player_in_final
-        elif type_table == "группы": # если ПФ
-            m_pl = player_in_final
-        else: # если финал сетка
-            m_pl = full_net_player(player_in_final)
+        m_pl = player_in_final
+        # if type_table == "круг": # если финал по кругу
+        #     m_pl = player_in_final
+        # elif type_table == "группы": # если ПФ
+        #     m_pl = player_in_final
+        # else: # если финал сетка
+        #     m_pl = player_in_final
+        #     # m_pl = full_net_player(player_in_final)
+
         # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
