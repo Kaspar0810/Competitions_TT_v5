@@ -9248,17 +9248,16 @@ def total_game_table(exit_stage, kpt, fin, pv):
         # ======
             if fin == "1-й финал" and type_table == "сетка":
                 result = msgBox.question(my_win, "Уведомление", "Будет ли разигрываться 3-е место\n в 1-ом финале?"
-                , msgBox.No, msgBox.Ok) 
-                if result == msgBox.Ok:
-                    no_game3 = 3
-                else:
+                , msgBox.No, msgBox.Yes) 
+                if result == msgBox.Yes:
                     no_game3 = ""
+                else:
+                    no_game3 = 3 # два 3-х места
 
             if exit_stage == "1-й полуфинал" or exit_stage == "2-й полуфинал":
                 system_exit = system.select().where(System.stage == exit_stage).get()
                 total_gr = system_exit.total_group 
 
-            # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
             if etap_text == "Суперфинал":
                 player_in_final = kpt
                 player_in_final_full = full_net_player(player_in_final)
@@ -14920,7 +14919,7 @@ def color_mesta(data, first_mesto, table, fin):
             style_color.append(fn)
             fn =  ('ALIGN', (ml[0], i), (ml[0], i), 'CENTER')
             style_color.append(fn)
-            if b == 2 and flag == '3':
+            if b == 2 and flag == 3: # значит два 3-х места
                 k += 1
                 b = 4 if k == 2 else 2
             else:
