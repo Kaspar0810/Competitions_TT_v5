@@ -5372,8 +5372,7 @@ def delete_player():
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
-    sys = system.select().where(System.stage == "Предварительный").get()
-    system_id = sys.id # id системы -Предварительного этапа-
+
     idx = my_win.tableView.currentIndex() # определиние номера строки
     row_num = idx.row()
 
@@ -5411,11 +5410,6 @@ def delete_player():
             else:
                 stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
             System.update(total_athletes=athlet - 1, label_string=stroka_kol_group).where(System.title_id == title_id()).execute()
-
-            # for sys in system:
-            #     athlet = sys.total_athletes
-            #     System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
-
             fin = "Предварительный"
             check_flag = check_choice(fin)
             if check_flag is True:
@@ -5423,8 +5417,8 @@ def delete_player():
                                                 f" {player_del} город {player_city_del}\n"
                                                 "будет удален(а) из посева.",
                                     msgBox.Ok)
-                # sys = system.select().where(System.stage == "Предварительный").get()
-                # system_id = sys.id # id системы -Предварительного этапа-
+                sys = system.select().where(System.stage == "Предварительный").get()
+                system_id = sys.id # id системы -Предварительного этапа-
                 
                 choices = Choice.delete().where(Choice.player_choice_id == player_id)
                 choices.execute()
@@ -5469,21 +5463,19 @@ def delete_player():
                         p2 -= 1
                     new_tour = f"{p1}-{p2}"
                     res = Result.update(tours=new_tour).where(Result.id == k)
-                    res.execute()
-                
-        else: # записывает в таблицу -Удаленные-
-            year = birthday[6:] 
-            monh  = birthday[3:5]
-            days = birthday[:2]
-            birthday_mod = f"{year}-{monh}-{days}"
-            # birthday_mod = datetime.now().strftime('%Y-%m-%d') # текущая дата в формате 01_01_2000
+                    res.execute()            
+        else: # если система еще не создана
+            # записывает в таблицу -Delete player-
+            birthday_mod = format_date_for_db(str_date=birthday)
             with db: 
                 del_player = Delete_player(player_del_id=player_id, bday=birthday_mod, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                             player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
+            choices = Choice.get(Choice.player_choice_id == player_id)
+            choices.delete_instance()
+        player = Player.get(Player.id == player_id)
+        player.delete_instance() # удаляет игрока из таблицы -PLayer-
 
-        player = Player.delete().where(Player.id == player_id)
-        player.execute()
         my_win.lineEdit_id.clear()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -8188,12 +8180,13 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
         else: 
             number_posev = [i for i in sev if i <= player_net // 2] # номера от 1 до 16 
     elif n > 1: 
+        quatro = player_net // 4 # количество номеров в четверти
         if n == 2: # уводит 3-е место от 2-ого в другую четверть
-            group_last = group_last[8:]
-            number_last = number_last[8:] # список номеров 2-ого посева
+            group_last = group_last[quatro:]
+            number_last = number_last[quatro:] # список номеров 2-ого посева
         elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-            group_last = group_last[:8] 
-            number_last = number_last[:8] # номера 1 мест в группах
+            group_last = group_last[:quatro] 
+            number_last = number_last[:quatro] # номера 1 мест в группах
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, во 4-ом посеве от которой надо увести
 
@@ -8228,12 +8221,13 @@ def number_setka_posev_last(cur_gr, group_last, number_last, n, player_net):
         else: 
             number_posev_old  = [i for i in number_last if i <= player_net // 2] # номера от 1 до 16 
     elif n > 1: 
+        quatro = player_net // 4 # количество номеров в четверти
         if n == 2: # уводит 3-е место от 2-ого в другую четверть
-            group_last = group_last[8:] 
-            number_last = number_last[8:]  
+            group_last = group_last[quatro:] 
+            number_last = number_last[quatro:]  
         elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-            group_last = group_last[:8] 
-            number_last = number_last[:8]
+            group_last = group_last[:quatro] 
+            number_last = number_last[:quatro]
 
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
