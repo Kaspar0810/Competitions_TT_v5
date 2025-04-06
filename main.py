@@ -1145,15 +1145,12 @@ class StartWindow(QMainWindow, Ui_Form):
     def open(self):
         """открытие соревнований из архива"""
         self.close() 
-        my_win.show()
         my_win.resize(1110, 750)
-        # self.last_comp()
         flag = check_delete_db()
-        if flag == 0 or flag == 1: # flag = 0 не старых баз, flag = 1 была отмена удаления старых баз
-            go_to()   
-        else:
-            delete_db_copy(del_files_list=flag)
-            my_win.show()
+        if isinstance(flag, list): # узнает принадлежит переменная к типу
+           delete_db_copy(del_files_list=flag) 
+        go_to() 
+        my_win.show()
 
 
     def new(self):
@@ -1860,9 +1857,9 @@ def db_select_title():
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[key +  1:]
-        name = txt[:key]
-        sroki = fir_window.label_4.text()
-        data = sroki[9:19]
+        name = txt[:key - 11]
+        # sroki = fir_window.label_4.text()
+        data = txt[key - 10: key]
         titles = Title.select()
         for title in titles:
             name_title = title.name
