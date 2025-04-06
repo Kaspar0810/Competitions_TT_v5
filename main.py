@@ -35,7 +35,6 @@ import sys
 
 import pymysql
 import subprocess
-# import mysql.connector
 #=============
 import pathlib
 from pathlib import Path
@@ -192,8 +191,8 @@ class _MyTableModel(QAbstractTableModel): # === вариант эксперем�
     
     def columnCount(self, parent):
         if len(self._data) > 0:
-            # return len(self._data[0])
-            return len(self._data.columns)
+            return len(self._data[0])
+            # return len(self._data.columns)
         else:
             return 0
 
@@ -1109,6 +1108,20 @@ class StartWindow(QMainWindow, Ui_Form):
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)   
     
+    # def open(self):
+    #     """открытие соревнований из архива"""
+    #     self.close() 
+    #     # my_win.show()
+    #     # my_win.resize(1110, 750)
+    #     last_comp(self)
+    #     flag = check_delete_db()
+    #     if flag == 0 or flag == 1: # flag = 0 не старых баз, flag = 1 была отмена удаления старых баз
+    #         go_to()   
+    #     else:
+    #         delete_db_copy(del_files_list=flag)
+    #         my_win.show()
+
+
     def last_comp(self):
         """открытие последних соревнований"""
         sex = ["Девочки", "Девушки", "Юниорки", "Женщины"]
@@ -1123,19 +1136,25 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         # === вставить  проверку DB ======      
         flag = check_delete_db()
-        if flag == 0:
+        if flag == 0 or flag == 1:
             return
         else:
             delete_db_copy(del_files_list=flag)
 
 
     def open(self):
-        flag = check_delete_db()
-        if flag != 0:
-            delete_db_copy(del_files_list=flag)
-        go_to()
-        self.close()
+        """открытие соревнований из архива"""
+        self.close() 
         my_win.show()
+        my_win.resize(1110, 750)
+        # self.last_comp()
+        flag = check_delete_db()
+        if flag == 0 or flag == 1: # flag = 0 не старых баз, flag = 1 была отмена удаления старых баз
+            go_to()   
+        else:
+            delete_db_copy(del_files_list=flag)
+            my_win.show()
+
 
     def new(self):
         """запускает новые соревнования"""
@@ -1323,10 +1342,10 @@ def check_delete_db():
         if result == msgBox.Ok:
             flag = del_files_list
         else:
-            flag = 0
+            flag = 1 # отмена
             return flag
     else:
-        flag = 1 # нет старых баз
+        flag = 0 # нет старых баз
     return flag
 
 
@@ -1400,8 +1419,6 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     my_win.statusbar.showMessage("Январский рейтинг загружен")
     # добавляет в таблицу регионы
     # получение последней записи в таблице
-    # t = Title.select().order_by(Title.id.desc()).get()
-    # title = t.id
     # === вариант если title id не номер один но соревнования первые
     titles = Title.select()
     count = len(titles)
@@ -2329,9 +2346,8 @@ def fill_table(player_list):
         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) 
     elif tb == 5: # рейтинг
-        # num_columns = [0, 1, 2, 3, 4, 5, 6]
         model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
-    elif tb == 7:
+    elif tb == 6:
         if sender == my_win.lineEdit_find_player_stat:
             num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
@@ -2351,7 +2367,7 @@ def fill_table(player_list):
         else:
             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
-    elif tb == 3 or tb == 7:
+    elif tb == 3 or tb == 6:
         my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
@@ -2407,7 +2423,7 @@ def fill_table(player_list):
                 item_10 = str(list(player_selected[row].values())[num_columns[9]])
                 data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp)
-            elif tb == 7:
+            elif tb == 6:
                 if sender != my_win.lineEdit_find_player_stat:
                     coach_id = str(list(player_selected[row].values())[num_columns[7]])
                     coach = Coach.get(Coach.id == coach_id)
@@ -2443,8 +2459,6 @@ def fill_table(player_list):
             row = 0
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
-    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-    # my_win.tableView.setSortingEnabled(True)
     my_win.tableView.show()
     # finish = time.time()
     # res = finish - start
@@ -2526,7 +2540,8 @@ def _fill_table(player_list): # ============== вариант эксперемн
     elif tb == 3:
         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         header_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']
-    elif tb == 6:
+    elif tb == 5:
+         num_columns = [0, 1, 4, 5, 6, 7, 8]
          header_list = ['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']
     elif tb == 7:
         if sender == my_win.lineEdit_find_player_stat:
@@ -3345,7 +3360,6 @@ def page():
     elif tb == 2:  # -система-
         my_win.tabWidget_2.setCurrentIndex(0)
         my_win.resize(1110, 750)
-        # my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 318, 841, 384))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
@@ -3356,8 +3370,6 @@ def page():
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
 
-        # player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
-        # count = len(player_list)
         player_list_main = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
         count = len(player_list_main)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
@@ -3536,7 +3548,7 @@ def page():
             my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_33.show()
             # сделать правильную сортировку по группам
-        player_list = Choice.select().where(Choice.title_id == title_id())
+        player_list = Choice.select().where((Choice.title_id == title_id()) & (Choice.family != "x"))
         fill_table(player_list)
         my_win.widget.hide()
         my_win.tableWidget.hide()
