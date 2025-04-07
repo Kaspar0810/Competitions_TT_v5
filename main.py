@@ -14928,7 +14928,7 @@ def color_mesta(data, first_mesto, table, fin):
             style_color.append(fn)
             fn =  ('ALIGN', (ml[0], i), (ml[0], i), 'CENTER')
             style_color.append(fn)
-            if b == 2 and flag == 3: # значит два 3-х места
+            if b == 2 and flag == "3": # значит два 3-х места
                 k += 1
                 b = 4 if k == 2 else 2
             else:
@@ -16163,12 +16163,12 @@ def open_close_file(view_file):
     return flag
 
 
-def button_check_on():
-    """включает кнопку проверки сетки"""
-    if my_win.checkBox_check_net.isChecked():
-        my_win.Button_check_net.setEnabled(True)
-    else:
-        my_win.Button_check_net.setEnabled(False)
+# def button_check_on():
+#     """включает кнопку проверки сетки"""
+#     if my_win.checkBox_check_net.isChecked():
+#         my_win.Button_check_net.setEnabled(True)
+#     else:
+#         my_win.Button_check_net.setEnabled(False)
 
 
 def check_choice_net(fin):
@@ -16205,6 +16205,15 @@ def check_choice_net(fin):
             coach_list.clear()
             c = 0
         g += 1
+
+
+def mesto_3_no_play():
+    """записывает в DB  изменения по разигрыванию 3 места"""
+    if my_win.checkBox_no_play_3.isChecked():
+        System.update(no_game="3").where((System.title_id == title_id()) & (System.stage == '1-й финал')).execute()
+    else:
+        System.update(no_game="").where((System.title_id == title_id()) & (System.stage == '1-й финал')).execute()
+
 
 
 # def proba_pdf():
@@ -16343,11 +16352,6 @@ my_win.lineEdit_num_game_fin.returnPressed.connect(filter_fin)
 
 my_win.lineEdit_pl1_score_total.returnPressed.connect(enter_total_score)
 my_win.lineEdit_pl2_score_total.returnPressed.connect(enter_total_score)
-# my_win.lineEdit_pl1_score_total_pf.returnPressed.connect(enter_total_score)
-# my_win.lineEdit_pl2_score_total_pf.returnPressed.connect(enter_total_score)
-# my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
-# my_win.lineEdit_pl2_score_total_fin.returnPressed.connect(enter_total_score)
-
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
 my_win.lineEdit_city_list.returnPressed.connect(add_city)
@@ -16468,7 +16472,7 @@ my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейти
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
 my_win.checkBox_double.stateChanged.connect(page_double)
-# my_win.checkBox_check_net.stateChanged.connect(button_check_on)
+my_win.checkBox_no_play_3.stateChanged.connect(mesto_3_no_play)
 # my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
