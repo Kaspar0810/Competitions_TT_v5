@@ -3167,24 +3167,12 @@ def tab():
 
 def tab_etap():
     """Включает или выключает вкладки на странице -Результаты-"""
-    sf_list = ["1-й полуфинал", "2-й полуфинал"]
-    tab_enabled_list = []
+    # sf_list = ["1-й полуфинал", "2-й полуфинал"]
+    # tab_enabled_list = []
     tab_etap = my_win.tabWidget_stage.currentIndex()
     results = Result.select().where(Result.title_id == title_id())    
     systems = System.select().where(System.title_id == title_id())
     tab_result()
-    # for i in systems:
-    #     etap = i.stage      
-    #     if etap == "Предварительный":
-    #         my_win.tabWidget_stage.setTabEnabled(0, True)
-    #         tab_enabled_list.append(0)
-    #     elif etap in sf_list:
-    #         my_win.tabWidget_stage.setTabEnabled(1, True)
-    #         tab_enabled_list.append(1)
-    #     elif etap != "Предварительный" and etap not in sf_list:
-    #         my_win.tabWidget_stage.setTabEnabled(2, True)
-    #         tab_enabled_list.append(2)
-    #         break
     if tab_etap == 0:
         player_list = results.select().where(Result.system_stage == "Предварительный")
         etap_text = "групповом этапе"
@@ -3197,6 +3185,10 @@ def tab_etap():
         player_list = results.select().where(Result.system_stage == "Финальный")
         load_combobox_filter_final()
         etap_text = "финальном этапе"
+        system = systems.select().where(System.stage == "1-й финал").get()
+        flag_3_place = system.no_game
+        if flag_3_place == "3": # отмечает checkBox если не разигрывается 3 место
+            my_win.checkBox_no_play_3.setChecked(True)
     count = len(player_list)
     my_win.label_16.setText(f'Всего в {etap_text}\n{count} игры')
     my_win.label_16.show()
@@ -4952,7 +4944,6 @@ def change_status_visible_and_score_game():
     if row_num == -1:
         return
     count = len(system)    
-    # if tab == 3:
     if row_num == -1: # не выбрана ни одна встреча
         system_stage = True
         match_db = 5
@@ -4968,26 +4959,11 @@ def change_status_visible_and_score_game():
                 pass
             else:
                 stage = my_win.tableView.model().index(row_num, 2).data() #  данные ячейки (из какого финала играют встречу)
-            # for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-            #     if i.isChecked():
-            #         stage_current = i.text()
-            #         break
-            # if stage_current == "Предварительный":
-            #     stage = stage_current
-            # else:
-            #     stage = my_win.tableView.model().index(row_num, 2).data() #  данные ячейки (из какого финала играют встречу)
         id_system = system_id(stage)
         system_stage = system.select().where(System.id == id_system).get()
-            # system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         match_current = match_db    
-        # system_stage = system.select().where(System.stage == "Предварительный").get()
-        # match_db = system_stage.score_flag # из сколь партий играть записано в DB по умолчанию из 5
-        # state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        # my_win.checkBox_4.setEnabled(state_visible)
-        # match_current = match_db
         #  ==== изменение состояние =====
     if sender == my_win.checkBox_4:
         for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -5017,126 +4993,15 @@ def change_status_visible_and_score_game():
         my_win.frame_five.setVisible(True)
         my_win.frame_seven.setVisible(True)
     my_win.label_22.setVisible(True)
-    # elif tab == 4:
-    #     if row_num == -1:
-    #         stage = "1-й полуфинал"
-    #     else:
-    #         id_res = my_win.tableView.model().index(row_num, 0).data() # данные строки tableView
-    #         result = Result.select().where(Result.id == id_res).get()
-    #         stage = result.system_stage
-    #     system_stage = system.select().where(System.stage == stage).get()
-    #     match_db = system_stage.score_flag
-    #     state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-    #     match_current = match_db
-    #     state_visible = state_visible_db
-    #     my_win.checkBox_14.setEnabled(state_visible)
-    #     #  ==== изменение состояние =====
-    #     if sender == my_win.checkBox_14:
-    #         for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-    #             if i.isChecked():
-    #                 match_current = int(i.text())
-    #                 break
-    #         state_visible = my_win.checkBox_14.isChecked()
-    #     elif (sender == my_win.radioButton_match_3 or 
-    #         sender == my_win.radioButton_match_5 or sender == my_win.radioButton_match_7):
-    #         for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-    #             if i.isChecked():
-    #                 match_current = int(i.text())
-    #                 break
-    #         state_visible = state_visible_db
-
-    #     if match_current == 3:
-    #         my_win.radioButton_match_9.setChecked(True)
-    #         my_win.frame_pf_three.setVisible(True)
-    #         my_win.frame_pf_five.setVisible(False)
-    #         my_win.frame_pf_seven.setVisible(False)
-    #     elif match_current == 5:
-    #         my_win.radioButton_match_10.setChecked(True)
-    #         my_win.frame_pf_three.setVisible(True)
-    #         my_win.frame_pf_five.setVisible(True)
-    #         my_win.frame_pf_seven.setVisible(False)
-    #     elif match_current == 7:
-    #         my_win.radioButton_match_11.setChecked(True)
-    #         my_win.frame_pf_three.setVisible(True)
-    #         my_win.frame_pf_five.setVisible(True)
-    #         my_win.frame_pf_seven.setVisible(True)
-    #     my_win.label_71.setVisible(True)
-    # else:
-        # if row_num == -1: # не выбрана ни одна встреча
-        #     system_stage = True
-        #     match_db = 5
-        #     match_current = 5
-        #     state_visible = True
-        # else:
-        #     if count == 1:
-        #         stage = "Одна таблица"
-        #     else:
-        #         for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-        #             if i.isChecked():
-        #                 stage_current = i.text()
-        #                 break
-        #         stage = my_win.tableView.model().index(row_num, 2).data() #  данные ячейки (из какого финала играют встречу)
-        #     # id_system = system_id(stage)
-        #     # system_stage = system.select().where(System.id == id_system).get()
-        #     system_stage = system.select().where(System.stage == stage).get()
-        #     match_db = system_stage.score_flag
-        #     state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        #     state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        #     match_current = match_db    
-        #=========
-
-        #  ==== изменение состояние =====
-        # if sender == my_win.checkBox_visible_game:
-        #     for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-        #         if i.isChecked():
-        #             match_current = int(i.text())
-        #             break
-        #     state_visible = my_win.checkBox_visible_game.isChecked()
-        # elif (sender == my_win.radioButton_match_4 or 
-        #     sender == my_win.radioButton_match_6 or sender == my_win.radioButton_match_8):
-        #     for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-        #         if i.isChecked():
-        #             match_current = int(i.text())
-        #             break
-        #     state_visible = state_visible_db
-
-        # if match_current == 3:
-        #     my_win.radioButton_match_4.setChecked(True)
-        #     my_win.frame_fin_three.setVisible(True)
-        #     my_win.frame_fin_five.setVisible(False)
-        #     my_win.frame_fin_seven.setVisible(False)
-        # elif match_current == 5:
-        #     my_win.radioButton_match_6.setChecked(True)
-        #     my_win.frame_fin_three.setVisible(True)
-        #     my_win.frame_fin_five.setVisible(True)
-        #     my_win.frame_fin_seven.setVisible(False)
-        # elif match_current == 7:
-        #     my_win.radioButton_match_8.setChecked(True)
-        #     my_win.frame_fin_three.setVisible(True)
-        #     my_win.frame_fin_five.setVisible(True)
-        #     my_win.frame_fin_seven.setVisible(True)
-        # my_win.label_40.setVisible(True)
+   
     if state_visible is False:
         frame_list = [my_win.frame_three,  my_win.frame_five, my_win.frame_seven]
-        # frame_pf_list = [my_win.frame_pf_three,  my_win.frame_pf_five, my_win.frame_pf_seven]
-        # frame_fin_list = [my_win.frame_fin_three,  my_win.frame_fin_five, my_win.frame_fin_seven]
         if tab == 3:
             for k in frame_list:
                 k.setVisible(False)
             my_win.checkBox_4.setChecked(False)
             my_win.lineEdit_pl1_score_total.setFocus(True)
-        # elif tab == 4:
-        #     for k in frame_pf_list:
-        #         k.setVisible(False)
-        #     my_win.checkBox_14.setChecked(False)
-        #     my_win.lineEdit_pl1_score_total_pf.setFocus(True)
-        # else:
-        #     for k in frame_fin_list:
-        #         k.setVisible(False)
-        #     my_win.checkBox_visible_game.setChecked(False)
-        #     my_win.lineEdit_pl1_score_total_fin.setFocus(True)
         my_win.label_22.setVisible(False)
-    # system_id = system_stage.id
     systems = system.select().where(System.id == id_system).get()
     with db:
         systems.score_flag = match_current
@@ -5185,18 +5050,6 @@ def visible_field():
                 my_win.lineEdit_pl1_s1.setFocus()
             else:
                 my_win.lineEdit_pl1_score_total.setFocus()
-        # elif tab == 4:
-        #     state_visible = my_win.checkBox_14.isChecked()
-        #     if state_visible is True:
-        #         my_win.lineEdit_pl1_s1_pf.setFocus()
-        #     else:
-        #         my_win.lineEdit_pl1_pf_score_total.setFocus()
-        # else:
-        #     state_visible = my_win.checkBox_visible_game.isChecked()
-        #     if state_visible is True:
-        #         my_win.lineEdit_pl1_s1_fin.setFocus()
-        #     else:
-        #         my_win.lineEdit_pl1_score_total_fin.setFocus()
     change_status_visible_and_score_game() 
     return state_visible
 
@@ -5922,10 +5775,6 @@ def control_mark_in_score(mark, sf):
    #     system = 
     if tab == 3:
         score_list = [my_win.lineEdit_pl1_score_total.text(), my_win.lineEdit_pl2_score_total.text()] # список общий счет в партии
-    # elif tab == 4:
-    #     score_list = [my_win.lineEdit_pl1_score_total_pf.text(), my_win.lineEdit_pl2_score_total_pf.text()]
-    # else:
-    #     score_list = [my_win.lineEdit_pl1_score_total_fin.text(), my_win.lineEdit_pl2_score_total_fin.text()]
 
     flag = True if str((sf + 1) // 2) in [score_list[0], score_list[1]] else False
 
@@ -5985,50 +5834,7 @@ def score_in_game():
         s26 = my_win.lineEdit_pl2_s6.text()
         s17 = my_win.lineEdit_pl1_s7.text()
         s27 = my_win.lineEdit_pl2_s7.text()
-    # elif tab == 4:
-    #     if row_num == -1:
-    #         stage = "1-й полуфинал"
-    #     else:
-    #         id_res = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
-    #         result = Result.select().where(Result.id == id_res).get()
-    #         stage = result.system_stage
-    #     sys = system.select().where(System.stage == stage).get()
-    #     sf = sys.score_flag  # флаг из скольки партий играется матч
-    #     s11 = my_win.lineEdit_pl1_s1_pf.text()
-    #     s21 = my_win.lineEdit_pl2_s1_pf.text()
-    #     s12 = my_win.lineEdit_pl1_s2_pf.text()
-    #     s22 = my_win.lineEdit_pl2_s2_pf.text()
-    #     s13 = my_win.lineEdit_pl1_s3_pf.text()
-    #     s23 = my_win.lineEdit_pl2_s3_pf.text()
-    #     s14 = my_win.lineEdit_pl1_s4_pf.text()
-    #     s24 = my_win.lineEdit_pl2_s4_pf.text()
-    #     s15 = my_win.lineEdit_pl1_s5_pf.text()
-    #     s25 = my_win.lineEdit_pl2_s5_pf.text()
-    #     s16 = my_win.lineEdit_pl1_s6_pf.text()
-    #     s26 = my_win.lineEdit_pl2_s6_pf.text()
-    #     s17 = my_win.lineEdit_pl1_s7_pf.text()
-    #     s27 = my_win.lineEdit_pl2_s7_pf.text()
-    # elif tab == 5:
-    #     # из какого финала пара игроков в данный момент
-    #     final = my_win.tableView.model().index(row_num, 2).data() # данные ячейки tableView
-    #     if stage == "Одна таблица":
-    #         final = stage
-    #     sys = system.select().where(System.stage == final).get()
-    #     sf = sys.score_flag  # флаг из скольки партий играется матч
-    #     s11 = my_win.lineEdit_pl1_s1_fin.text()
-    #     s21 = my_win.lineEdit_pl2_s1_fin.text()
-    #     s12 = my_win.lineEdit_pl1_s2_fin.text()
-    #     s22 = my_win.lineEdit_pl2_s2_fin.text()
-    #     s13 = my_win.lineEdit_pl1_s3_fin.text()
-    #     s23 = my_win.lineEdit_pl2_s3_fin.text()
-    #     s14 = my_win.lineEdit_pl1_s4_fin.text()
-    #     s24 = my_win.lineEdit_pl2_s4_fin.text()
-    #     s15 = my_win.lineEdit_pl1_s5_fin.text()
-    #     s25 = my_win.lineEdit_pl2_s5_fin.text()
-    #     s16 = my_win.lineEdit_pl1_s6_fin.text()
-    #     s26 = my_win.lineEdit_pl2_s6_fin.text()
-    #     s17 = my_win.lineEdit_pl1_s7_fin.text()
-    #     s27 = my_win.lineEdit_pl2_s7_fin.text()
+
     if sf == 3:
         total_score = [s11, s21, s12, s22, s13, s23]
         max_game = 2
@@ -6066,20 +5872,6 @@ def score_in_game():
                         # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
                         my_win.Button_Ok.setEnabled(True)
                         my_win.Button_Ok.setFocus()
-                # elif tab == 4:
-                #     my_win.lineEdit_pl1_score_total_pf.setText(str(st1))
-                #     my_win.lineEdit_pl2_score_total_pf.setText(str(st2))
-                #     if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-                #         # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
-                #         my_win.Button_Ok_pf.setEnabled(True)
-                #         my_win.Button_Ok_pf.setFocus()
-                # elif tab == 5:
-                #     my_win.lineEdit_pl1_score_total_fin.setText(str(st1))
-                #     my_win.lineEdit_pl2_score_total_fin.setText(str(st2))
-                #     if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-                #         # если игрок набрал макс очки активирует кнопку ОК и переводит на нее фокус
-                #         my_win.Button_Ok_fin.setEnabled(True)
-                #         my_win.Button_Ok_fin.setFocus()
                 total_game.append(st1)
                 total_game.append(st2)
                 # находит максимальное число очков из сыгранных партий
@@ -6235,7 +6027,7 @@ def enter_score(none_player=0):
             sc_total = circle_type(none_player, stage)
     else:  # финалы
         if type == "сетка":
-            sc_total = setka_type(none_player)
+            sc_total = setka_type(none_player) # список 1-й счет победителя, 2-й счет проигравшего, 3-й очки победителя и очки проигравшего
             flag = 1
         else:  # по кругу
             sc_total = circle_type(none_player, stage)
@@ -13560,6 +13352,7 @@ def numer_game(num_game, vid_setki):
                       14: -14, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
                       27: -27, 31: -31, 32: -32, 35: -35, 36: -36}
         dict_mesta = [15, 28, 29, 30, 33, 34, 37, 38]
+        dict_mesta_without_3 = [26, 27]
     elif vid_setki == 'Сетка (с розыгрышем всех мест) на 32 участников':
         dict_winner = {1: 17, 2: 17, 3: 18, 4: 18, 5: 19, 6: 19, 7: 20, 8: 20, 9: 21, 10: 21, 11: 22, 12: 22, 13: 23, 14: 23,
                    15: 24, 16: 24, 17: 25, 18: 25, 19: 26, 20: 26, 21: 27, 22: 27, 23: 28, 24: 28, 25: 29, 26: 29, 27: 30, 28: 30, 
@@ -13597,9 +13390,30 @@ def numer_game(num_game, vid_setki):
                     71: -71, 72: -72, 73: -73, 74: -74, 75: -75, 76: -76, 79: -79, 80: -80, 83: -83, 84: -84, 85: -85, 86: -86, 87: -87,
                     88: -88, 91: -91, 92: -92}
         dict_mesta = [31, 60, 61, 62, 65, 66, 69, 70, 77, 78, 81, 82, 89, 90, 93, 94]
-    elif vid_setki == 'Сетка (1-3 место) на 32 участников':
-        pass
+    elif vid_setki == 'Сетка (1-3 место) на 32 участников': # поправить
+        dict_winner = {1: 17, 2: 17, 3: 18, 4: 18, 5: 19, 6: 19, 7: 20, 8: 20, 9: 21, 10: 21, 11: 22, 12: 22, 13: 23, 14: 23,
+                   15: 24, 16: 24, 17: 25, 18: 25, 19: 26, 20: 26, 21: 27, 22: 27, 23: 28, 24: 28, 25: 29, 26: 29, 27: 30, 28: 30, 
+                   29: 31, 30: 31, 33: 35, 34: 35, 37: 41, 38: 41, 39: 42, 40: 42, 41: 43, 42: 43, 45: 47, 46: 47, 49: 57, 50: 57,
+                   51: 58, 52: 58, 53: 59, 54: 59, 55: 60, 56: 60, 57: 61, 58: 61, 59: 62, 60: 62, 61: 63, 62: 63, 65: 67, 66: 67,
+                   69: 73, 70: 73, 71: 74, 72: 74, 73: 75, 74: 75, 77: 79, 78: 79}
+        dict_loser = {1: 49, 2: 49, 3: 50, 4: 50, 5: 51, 6: 51, 7: 52, 8: 52, 9: 53, 10: 53, 11: 54, 12: 54, 13: 55, 14: 55, 15: 56, 16: 56,
+                  17: 37, 18: 37, 19: 38, 20: 38, 21: 39, 22: 39, 23: 40, 24: 40, 25: 33, 26: 33, 27: 34, 28: 34, 29: 32, 30: 32,
+                  33: 36, 34: 36, 37: 45, 38: 45, 39: 46, 40: 46, 41: 44, 42: 44, 45: 48, 46: 48, 49: 69, 50: 69, 51: 70, 52: 70, 53: 71, 54: 71, 55: 72, 56: 72,
+                  57: 65, 58: 65, 59: 66, 60: 66, 61: 64, 62: 64, 65: 68, 66: 68, 69: 77, 70: 77, 71: 78, 72: 78, 73: 76, 74: 76, 77: 80, 78: 80}
+        dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
+                    14: -14, 15: -15, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
+                    27: -27, 28: -28, 29: -29, 30: -30, 33: -33, 34: -34, 37: -37, 38: -38, 39: -39, 40: -40, 41: -41, 42: -42, 45: -45, 46: -46,
+                    49: -49, 50: -50, 51: -51, 52: -52, 53: -53, 54: -54, 55: -55, 56: -56, 57: -57, 58: -58, 59: -59, 60: -60, 61: -61, 62: -62, 65: -65, 66: -66,
+                    69: -69, 70: -70, 71: -71, 72: -72, 73: -73, 74: -74, 75: -75, 77: -77, 78: -78, 79: -79}
+        dict_mesta = [31, 32, 35, 36, 43, 44, 47, 48, 63, 64, 67, 68, 75, 76, 79, 80]
 
+    # flag_checkBox_3_no_game = my_win.checkBox_no_play_3.checkState()
+    # if num_game in dict_mesta_without_3 and flag_checkBox_3_no_game == 2: # встреча за 3-е место не играется
+    #     index = dict_mesta_without_3.index(num_game)
+    #     snoska = [0, 0]
+    #     # для отображения в pdf (встречи с минусом)
+    #     game_loser = dict_mesta_without_3[index] * -1
+    #     snoska.append(game_loser)  
     if num_game in dict_mesta: # если встреча за места
         index = dict_mesta.index(num_game)
         snoska = [0, 0]
