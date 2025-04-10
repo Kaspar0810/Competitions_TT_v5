@@ -52,7 +52,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3006,10 +3006,10 @@
      <widget class="QCheckBox" name="checkBox_4">
       <property name="geometry">
        <rect>
-        <x>680</x>
-        <y>15</y>
-        <width>131</width>
-        <height>21</height>
+        <x>660</x>
+        <y>6</y>
+        <width>71</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
@@ -3025,13 +3025,28 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string>Счет в партии</string>
+       <string>Счет в
+партии</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
       </property>
       <property name="checked">
        <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_3_mesta">
+      <property name="geometry">
+       <rect>
+        <x>739</x>
+        <y>7</y>
+        <width>75</width>
+        <height>38</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Два 
+3 места</string>
       </property>
      </widget>
     </widget>
@@ -4580,8 +4595,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4593,8 +4608,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5206,8 +5221,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5718,8 +5733,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6447,8 +6462,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6514,8 +6529,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>239</width>
+       <height>434</height>
       </rect>
      </property>
      <attribute name="label">

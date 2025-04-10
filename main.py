@@ -3574,6 +3574,25 @@ def page():
         Button_view.setFlat(True)
         Button_view.show()
         Button_view.clicked.connect(view)
+        # ============= 
+        # vbox = QVBoxLayout()   
+        # Button_3_mesta = QPushButton("Два 3 места") # (в каком виджете размещена)
+        # my_win.vbox.addWidget(Button_3_mesta)
+        # Button_3_mesta.resize(100, 30) # размеры кнопки (длина 120, ширина 50)
+        # Button_3_mesta.move(850, 40) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        # # Button_3_mesta.setText("Два 3 места")
+        # Button_3_mesta.show()
+        # Button_3_mesta.clicked.connect(two_3_place)
+        # == определяет разигрывается 3-е место или нет и в зависимости от этого включает кнопку и checkBox
+        system = sf.select().where(System.stage == "1-й финал").get()
+        flag_3 = system.no_game
+        if flag_3 == '3':
+            my_win.checkBox_no_play_3.setChecked(True)
+            my_win.Button_3_mesta.setEnabled(True)
+        else:
+            my_win.checkBox_no_play_3.setChecked(False)
+            my_win.Button_3_mesta.setEnabled(False)
+        # =============
         Label_view = QLabel(my_win.tabWidget)
         Label_view.resize(150, 80) # размеры кнопки (длина 120, ширина 50)
         Label_view.move(880, 120) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
@@ -12942,7 +12961,10 @@ def write_in_setka(data, stage, first_mesto, table):
             for k in column_dict.keys():
                 num_game_list = column_dict[k]  
                 if str(i) in num_game_list:
-                    col_win = k + 1
+                    if i == 28:
+                        col_win = k
+                    else: 
+                        col_win = k + 1
                     break
                 # выяснить номер стоблца по сетка 32 минус 2
                     # if k == column_last - 1:
@@ -16024,11 +16046,42 @@ def check_choice_net(fin):
 def mesto_3_no_play():
     """записывает в DB  изменения по разигрыванию 3 места"""
     if my_win.checkBox_no_play_3.isChecked():
-        System.update(no_game="3").where((System.title_id == title_id()) & (System.stage == '1-й финал')).execute()
+        my_win.Button_3_mesta.setEnabled(True)
+        n_g = "3"  
     else:
-        System.update(no_game="").where((System.title_id == title_id()) & (System.stage == '1-й финал')).execute()
+        n_g = ""
+        my_win.Button_3_mesta.setEnabled(False)
+    System.update(no_game=n_g).where((System.title_id == title_id()) & (System.stage == '1-й финал')).execute()
+        
 
-
+def two_3_place():
+    """Когда не разигрывается 3-е место"""
+    msgBox = QMessageBox()
+    systems = System.select().where((System.title_id == title_id()) & (System.stage == '1-й финал')).get()
+    results = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
+    system_table = systems.label_string
+    if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
+        number_game = 12
+    elif system_table == "Сетка (-2) на 8 участников":
+        number_game = 14
+    elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
+        number_game = 32
+    elif system_table == "Сетка (-2) на 16 участников":
+        number_game = 28
+    elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+        number_game = 80
+    elif system_table == "Сетка (-2) на 32 участников":
+        number_game = 94
+    elif system_table == "Сетка (1-3 место) на 32 участников":
+        number_game = 32
+    game = results.select().where(Result.tours == number_game).get()
+    if game.player1 == "" or game.player2 == "":
+        msgBox.information(my_win, "Уведомление", "Нет одного из игроков,\nзанявшего 3-е место.")
+        return
+    else:
+        Result.update(winner=game.player1, loser=game.player2).where(Result.tours == number_game).execute()
+    player_list = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
+    fill_table(player_list)
 
 # def proba_pdf():
     # """проба пдф"""
@@ -16294,7 +16347,7 @@ my_win.checkBox_no_play_3.stateChanged.connect(mesto_3_no_play)
 
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 # my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
-# my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
+my_win.Button_3_mesta.clicked.connect(two_3_place)
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_reset_filter_gr.clicked.connect(reset_filter)
