@@ -5652,39 +5652,31 @@ def enter_total_score():
     mark = 0
     flag = 0
     mistake = 0
-    if sender == my_win.lineEdit_pl1_score_total_gr:
-        mark = my_win.lineEdit_pl1_score_total_gr.text()
+    if sender == my_win.lineEdit_pl1_score_total:
+        mark = my_win.lineEdit_pl1_score_total.text()
         flag = 0
-    elif sender == my_win.lineEdit_pl2_score_total_gr:
-        mark = my_win.lineEdit_pl2_score_total_gr.text()
+    elif sender == my_win.lineEdit_pl2_score_total:
+        mark = my_win.lineEdit_pl2_score_total.text()
         flag = 1 
-    elif sender == my_win.lineEdit_pl1_score_total_pf:
-        mark = my_win.lineEdit_pl1_score_total_pf.text()
-        flag = 0
-    elif sender == my_win.lineEdit_pl2_score_total_pf:
-        mark = my_win.lineEdit_pl2_score_total_pf.text()
-        flag = 1  
-    elif sender == my_win.lineEdit_pl1_score_total_fin:
-        mark = my_win.lineEdit_pl1_score_total_fin.text()
-        flag = 0
-    elif sender == my_win.lineEdit_pl2_score_total_fin:
-        mark = my_win.lineEdit_pl2_score_total_fin.text()
-        flag = 1  
+    # elif sender == my_win.lineEdit_pl1_score_total_pf:
+    #     mark = my_win.lineEdit_pl1_score_total_pf.text()
+    #     flag = 0
+    # elif sender == my_win.lineEdit_pl2_score_total_pf:
+    #     mark = my_win.lineEdit_pl2_score_total_pf.text()
+    #     flag = 1  
+    # elif sender == my_win.lineEdit_pl1_score_total_fin:
+    #     mark = my_win.lineEdit_pl1_score_total_fin.text()
+    #     flag = 0
+    # elif sender == my_win.lineEdit_pl2_score_total_fin:
+    #     mark = my_win.lineEdit_pl2_score_total_fin.text()
+        # flag = 1  
     if mark != "":  
         mark = int(mark)
         mistake = check_input_total_score(mark, flag)
         if tab == 3 and flag == 0:
-            my_win.lineEdit_pl2_score_total_gr.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_gr.setFocus()
-        elif tab == 4 and flag == 0:
-            my_win.lineEdit_pl2_score_total_pf.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_pf.setFocus()
-        elif tab == 5 and flag == 0:
-            my_win.lineEdit_pl2_score_total_fin.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_fin.setFocus()
+            my_win.lineEdit_pl2_score_total.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total.setFocus()
         elif tab == 3 and flag == 1:
-            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_gr.setFocus()
-        elif tab == 4 and flag == 1:
-            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_pf.setFocus()
-        elif tab == 5 and flag == 1:
-            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_fin.setFocus()
+            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total.setFocus()
     else:
         reply = msgBox.information(my_win, 'Уведомление',
                                                 "Проверьте правильность ввода счета!",
@@ -5703,22 +5695,22 @@ def check_input_total_score(mark, flag):
             if i.isChecked():
                 match_current = int(i.text())
                 break
-        s1 = my_win.lineEdit_pl1_score_total_gr.text()
-        s2 = my_win.lineEdit_pl2_score_total_gr.text()
-    elif tab == 4:
-        for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-            if i.isChecked():
-                match_current = int(i.text())
-                break
-        s1 = my_win.lineEdit_pl1_score_total_pf.text()
-        s2 = my_win.lineEdit_pl2_score_total_pf.text()
-    else:
-        for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-            if i.isChecked():
-                match_current = int(i.text())
-                break
-        s1 = my_win.lineEdit_pl1_score_total_fin.text()
-        s2 = my_win.lineEdit_pl2_score_total_fin.text()
+        s1 = my_win.lineEdit_pl1_score_total.text()
+        s2 = my_win.lineEdit_pl2_score_total.text()
+    # elif tab == 4:
+    #     for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+    #         if i.isChecked():
+    #             match_current = int(i.text())
+    #             break
+    #     s1 = my_win.lineEdit_pl1_score_total_pf.text()
+    #     s2 = my_win.lineEdit_pl2_score_total_pf.text()
+    # else:
+    #     for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+    #         if i.isChecked():
+    #             match_current = int(i.text())
+    #             break
+    #     s1 = my_win.lineEdit_pl1_score_total_fin.text()
+    #     s2 = my_win.lineEdit_pl2_score_total_fin.text()
     if mark in mark_int:
         if flag == 1:
             score_list.append(int(s1))
@@ -6009,13 +6001,15 @@ def check_real_player():
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
      очки проигравшего]"""
+    sender = my_win.sender()
     tab_etap = my_win.tabWidget_stage.currentIndex()
     row_num = my_win.tableView.currentIndex().row()
     id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
     fin = my_win.tableView.model().index(row_num, 2).data() # данные ячейки tableView
     num_game = my_win.tableView.model().index(row_num, 3).data() # данные ячейки tableView
-    if row_num == -1: # значит не выбрана ни одна строка и нажат ентер
-        return
+    if sender != my_win.Button_3_mesta:
+        if row_num == -1: # значит не выбрана ни одна строка и нажат ентер
+            return
 
     sys = System.select().where(System.title_id == title_id()) 
     if tab_etap == 0: # группы
@@ -11930,7 +11924,7 @@ def setka_16_2_made(fin):
     gamer = titles.gamer
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
     for i in range(0, 86):
-        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -11972,7 +11966,7 @@ def setka_16_2_made(fin):
 
 
     # ============= данные игроков и встреч и размещение по сетке =============
-    tds = write_in_setka(data, fin, first_mesto, table)
+    tds = write_in_setka(data, fin, first_mesto, table) # сюда приходит чистая data
     #===============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
            0.4 * cm, 4.4 * cm, 0.4 * cm))
@@ -12034,8 +12028,8 @@ def setka_16_2_made(fin):
         fn = ('ALIGN', (i + 1, 0), (i + 1, 85), 'CENTER')
         style.append(fn)
    
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
 
@@ -12744,7 +12738,7 @@ def write_in_setka(data, stage, first_mesto, table):
         mesta_dict = {15: 15, 16: 29, 19: 34, 20: 39, 27: 47, 28: 55, 31: 60, 32: 65}
     elif table == "setka_16_2": # встречи, где играют победители и проигравший из основного тура  например 22: [54, 54] в списке одинаковые строки
         row_last = 85
-        column_last = 11
+        column_last = 10
         row_end = 33
         row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [5], 10: [13], 11: [21], 12: [29], 13: [9], 14: [25], 15: [17], 
                        16: [46], 17: [50], 18: [54], 19: [58], 20: [45], 21: [49], 22: [53], 23: [57], 24: [47], 25: [55], 26: [45], 27: [53], 28: [49], 29: [61],
@@ -12935,7 +12929,7 @@ def write_in_setka(data, stage, first_mesto, table):
                         win = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             # ========== расстановка для сетки на 16
-            if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
+            if c != 0: #  номер встречи в сетке куда попадает победитель (кроме встреч за места)
                 row_win = row_num_win[i][0] # номера строк данной встречи в сетке
                 c1 = []
                 c1_tmp = []
@@ -12961,11 +12955,16 @@ def write_in_setka(data, stage, first_mesto, table):
             for k in column_dict.keys():
                 num_game_list = column_dict[k]  
                 if str(i) in num_game_list:
-                    if i == 28:
+                    if i == 28: # вариант у таблицы 16-2 встреча за 3 место 
                         col_win = k
                     else: 
                         col_win = k + 1
                     break
+                    #   if i == 28: # вариант у таблицы 16-2 встреча за 3 место 
+                    #     col_win = k
+                    # else: 
+                    #     col_win = k + 1
+                    
                 # выяснить номер стоблца по сетка 32 минус 2
                     # if k == column_last - 1:
                     #     # col_win = k - 1
@@ -16061,17 +16060,17 @@ def two_3_place():
     results = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
     system_table = systems.label_string
     if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
-        number_game = 12
+        number_game = 8
     elif system_table == "Сетка (-2) на 8 участников":
-        number_game = 14
+        number_game = 12
     elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
-        number_game = 32
+        number_game = 16
     elif system_table == "Сетка (-2) на 16 участников":
         number_game = 28
     elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-        number_game = 80
+        number_game = 32
     elif system_table == "Сетка (-2) на 32 участников":
-        number_game = 94
+        number_game = 60
     elif system_table == "Сетка (1-3 место) на 32 участников":
         number_game = 32
     game = results.select().where(Result.tours == number_game).get()
@@ -16080,6 +16079,7 @@ def two_3_place():
         return
     else:
         Result.update(winner=game.player1, loser=game.player2).where(Result.tours == number_game).execute()
+    enter_score()
     player_list = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
     fill_table(player_list)
 
