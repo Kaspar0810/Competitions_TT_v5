@@ -13376,7 +13376,6 @@ def numer_game(num_game, vid_setki):
                       14: -14, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
                       27: -27, 31: -31, 32: -32, 35: -35, 36: -36}
         dict_mesta = [15, 28, 29, 30, 33, 34, 37, 38]
-        dict_mesta_without_3 = [26, 27]
     elif vid_setki == 'Сетка (с розыгрышем всех мест) на 32 участников':
         dict_winner = {1: 17, 2: 17, 3: 18, 4: 18, 5: 19, 6: 19, 7: 20, 8: 20, 9: 21, 10: 21, 11: 22, 12: 22, 13: 23, 14: 23,
                    15: 24, 16: 24, 17: 25, 18: 25, 19: 26, 20: 26, 21: 27, 22: 27, 23: 28, 24: 28, 25: 29, 26: 29, 27: 30, 28: 30, 
@@ -13431,19 +13430,8 @@ def numer_game(num_game, vid_setki):
                     69: -69, 70: -70, 71: -71, 72: -72, 73: -73, 74: -74, 75: -75, 77: -77, 78: -78, 79: -79}
         dict_mesta = [31, 32, 35, 36, 43, 44, 47, 48, 63, 64, 67, 68, 75, 76, 79, 80]
 
-    # flag_checkBox_3_no_game = my_win.checkBox_no_play_3.checkState()
-    # if num_game in dict_mesta_without_3 and flag_checkBox_3_no_game == 2: # встреча за 3-е место не играется
-    #     index = dict_mesta_without_3.index(num_game)
-    #     snoska = [0, 0]
-    #     # для отображения в pdf (встречи с минусом)
-    #     game_loser = dict_mesta_without_3[index] * -1
-    #     snoska.append(game_loser)  
     if num_game in dict_mesta: # если встреча за места
-        # index = dict_mesta.index(num_game)
         snoska = [0, 0, (num_game * -1)]
-        # для отображения в pdf (встречи с минусом)
-        # game_loser = dict_mesta[index] * -1
-        # snoska.append((mum_game * -1))
     else:
         game_winner = dict_winner[num_game]  # номер игры победителя
         snoska.append(game_winner)
@@ -13471,7 +13459,7 @@ def score_in_setka(stage, place_3rd):
         num_game = int(res.tours)
         
         if res.winner is not None and res.winner != "": # значит встреча сыграна
-            if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked():
+            if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked(): # если два 3-х места
                 if res.player1 != "" and res.player2 != "":
                     res = result.select().where(Result.tours == place_3rd).get()
                     id_pl1 = player.select().where(Player.full_name == res.player1).get()
@@ -14604,15 +14592,6 @@ def color_mesta(data, first_mesto, table, fin):
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
     flag = system.no_game
 
-    # for i in system:
-    #     stage = i.stage
-    #     type_table = i.type_table
-    #     if stage == "1-й финал" and type_table == "сетка":
-    #         flag = i.no_game
-    #         break
-    #     else:
-    #         flag = ""
-
     ml = [] # столбец, ряд -1 ого места, ряд 2-ого места + 1, шаг между местами
     f = 0 # количество столбцов
     if table == "setka_32":
@@ -14777,42 +14756,6 @@ def color_mesta(data, first_mesto, table, fin):
     return style_color   
 
 
-# def last_competition():
-#     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-#     title = Title.select().order_by(Title.data_start.desc())
-#     i = 0
-#     for t in title:
-#         full_name = t.full_name_comp
-#         if i > 5:
-#             break
-#         if i == 0: 
-#             if full_name != "":
-#                 my_win.first_comp_Action.setText(full_name)
-#             else:
-#                 my_win.first_comp_Action.setText("Пусто")
-#         elif i == 1: 
-#             if full_name != "":
-#                 my_win.second_comp_Action.setText(full_name)
-#             else:
-#                 my_win.second_comp_Action.setText("Пусто")
-#         elif i == 2: 
-#             if full_name != "":
-#                 my_win.third_comp_Action.setText(full_name)
-#             else:
-#                 my_win.third_comp_Action.setText("Пусто")
-#         elif i == 3: 
-#             if full_name != "":
-#                 my_win.fourth_comp_Action.setText(full_name)
-#             else:
-#                 my_win.fourth_comp_Action.setText("Пусто")
-#         elif i == 4: 
-#             if full_name != "":
-#                 my_win.fifth_comp_Action.setText(full_name)
-#             else:
-#                 my_win.fifth_comp_Action.setText("Пусто")
-#         i += 1
-
-
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
     tour_list = []
@@ -14893,100 +14836,6 @@ def tours_list(cp):
 
     tour_list = tr[cp]
     return tour_list
-
-
-# ====
-# def load_playing_game_in_table_for_semifinal(stage):
-#     """растановка в полуфинале игроков со встречей сыгранной в группе"""
-#     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
-#     posev_player_exit_out_gr = []
-#     player_exit = []    
-#     mesto_rank = 1 # начальное место с которого вышли в финал
-#     system = System.select().where(System.title_id == title_id())
-#     choice = Choice.select().where(Choice.title_id == title_id())
-#     results = Result.select().where(Result.title_id == title_id())
-#     sys = system.select().where(System.stage == "Предварительный").get()
-#     sys_semifin = system.select().where(System.stage == stage).get()
-#     kol_gr = sys.total_group
-#     if stage == "1-й полуфинал":
-#         mesto_rank = 1
-#     else:
-#         sys_fin_last = system.select().where(System.stage == stage).get()
-#         mesto_rank = sys_fin_last.mesta_exit + 1 # место, попадающих в финал из группы начало
-#     how_many_mest_exit = sys_semifin.mesta_exit # количество мест попадающих из предварительного этапа
-#     for i in range(1, kol_gr + 1): # цикл по группам
-#         posev_player_exit_out_gr.clear()
-#         id_player_exit_out_gr.clear()
-#         choice_group = choice.select().where(Choice.group == f"{i} группа") 
-#         kol_player = len(choice_group) # число участников в группе
-#         if mesto_rank + how_many_mest_exit <= kol_player:
-#             mesto_rank_end = mesto_rank + how_many_mest_exit
-#         else:
-#             mesto_rank_end = kol_player + 1
-#         n = 0
-#         for k in range(mesto_rank, mesto_rank_end): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
-#             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
-#             pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
-#             pl_posev = ch_mesto_exit.posev_group
-#             id_player_exit_out_gr.append(pl_id)
-#             posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
-#             n += 1
-
-#         posev_pl = []
-#         temp = []
-#         posev_id_pl = []
-#         all_posev_id_pl = []
-#         if n > 1:
-#             # получаем все варианты встреч, сыгранных в группе игроков которые попали в финал
-#             for i in combinations(posev_player_exit_out_gr, 2):
-#                 posev_player_exit = list(i)
-#                 for v in posev_player_exit:
-#                     ind = posev_player_exit_out_gr.index(v)
-#                     id_player = id_player_exit_out_gr[ind]
-#                     temp.append(id_player)
-#                     posev_id_pl = temp.copy()
-#                 temp.clear()
-#                 posev_pl.append(posev_player_exit)
-#                 all_posev_id_pl.append(posev_id_pl)
-
-#             result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
-#             for d in range(0, len(posev_pl)):
-#                 posev_exit = posev_pl[d]
-#                 id_player_exit = all_posev_id_pl[d]
-#                 if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
-#                     id_player_exit.reverse()
-                    
-#                 player_exit.clear()
-#                 posev_exit.clear()
-#                 for l in id_player_exit:
-#                     players = Player.select().where(Player.id == l).get()
-#                     family_city = players.full_name
-#                     player_exit.append(family_city)  
-#                     # номер ид в таблице -Result- встречи игроков, попавших в полуфинал идущих по расстоновке в таблице   
-#                 result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
-
-#                 result_pre_fin = results.select().where(Result.system_stage == stage)
-#                 result_semifin_player1 = result_pre_fin.select().where(Result.player1.in_(player_exit))
-#                 result_semifin = result_semifin_player1.select().where(Result.player2.in_(player_exit)).get()
-
-#                 with db:
-#                     result_semifin.winner = result_gr.winner
-#                     result_semifin.points_win = result_gr.points_win
-#                     result_semifin.score_in_game = result_gr.score_in_game
-#                     result_semifin.score_win = result_gr.score_win
-#                     result_semifin.loser = result_gr.loser
-#                     result_semifin.points_loser = result_gr.points_loser
-#                     result_semifin.score_loser = result_gr.score_loser
-#                     result_semifin.save()
-#     pv = sys_semifin.page_vid
-#     my_win.tabWidget.setCurrentIndex(4)
-#     table_made(pv, stage)
-
-
-# ====
-
-
-
 
 
 def load_playing_game_in_table_for_semifinal(stage):
@@ -15283,7 +15132,6 @@ def randevy_list():
     #========
     result_list = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
     
-
     book = op.Workbook()
     worksheet = book.active
     thins = Side(border_style="medium", color="0000ff")
@@ -16083,9 +15931,13 @@ def two_3_place():
     if game.player1 == "" or game.player2 == "":
         msgBox.information(my_win, "Уведомление", "Нет одного из игроков,\nзанявшего 3-е место.")
         return
-    else:
+    else: 
+        win_3thd = game.winner
+        if win_3thd is not None:
+            question = msgBox.question(my_win, "Уведомление", "Вы уже занесли игроков, занявших 3-е место.\nЕсли хотите обновить данные. Нажмите - ОК-", msgBox.Ok, msgBox.Cancel)
+            if question ==  msgBox.Cancel:
+                return
         Result.update(winner=game.player1, loser=game.player2).where(Result.tours == number_game).execute()
-    # enter_score()
     player_list = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
     fill_table(player_list)
 
