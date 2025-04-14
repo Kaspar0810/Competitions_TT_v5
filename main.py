@@ -15852,12 +15852,48 @@ def open_close_file(view_file):
     return flag
 
 
-# def button_check_on():
-#     """включает кнопку проверки сетки"""
-#     if my_win.checkBox_check_net.isChecked():
-#         my_win.Button_check_net.setEnabled(True)
-#     else:
-#         my_win.Button_check_net.setEnabled(False)
+def double_family():
+    """создает список двойных фамилий"""
+    double_pl_dict = {}
+    players = Player.select().where(Player.title_id == title_id())
+    for k in players:
+        id_pl = k.id
+        pl_fam_name = k.player
+        mark = pl_fam_name.find(" ")
+        pl_fam = pl_fam_name[: mark]
+        double_pl_dict[id_pl] = pl_fam
+
+    book = op.Workbook()
+    worksheet = book.active
+    names_headers = ["№", "Фамилия, Имя", "Город"]
+    for m in range(1, 4):
+        c =  worksheet.cell(row = 1, column = m)
+        c.value = names_headers[m - 1]
+
+    k = 2    
+    for pl in players:
+        fio = pl.player
+        gorod = pl.city
+        n = k - 1
+        c1 = worksheet.cell(row = k, column = 1)
+        c1.value = n
+        c2 = worksheet.cell(row = k, column = 2)
+        c2.value = fio
+        c3 = worksheet.cell(row = k, column = 3)
+        c3.value = gorod
+ 
+        k += 1
+
+    t_id = Title.get(Title.id == title_id())
+
+    worksheet.column_dimensions['A'].width = 8
+    worksheet.column_dimensions['B'].width = 25
+    worksheet.column_dimensions['C'].width = 25
+   
+    sex = t_id.gamer
+    f_name = f"{sex}_двойные _фамилии.xlsx"
+    filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
+    book.save(filename)
 
 
 def check_choice_net(fin):
@@ -16257,7 +16293,8 @@ my_win.Button_players_on_pdf_file.clicked.connect(made_list_players_for_pdf_file
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
-# my_win.Button_check_net.clicked.connect(check_choice_net) # проверка жеребьевки сетки
+my_win.Button_double_name.clicked.connect(double_family) # создание списка двойных фамилий
+
 
 my_win.Button_pay.clicked.connect(check_pay)
 sys.exit(app.exec())
