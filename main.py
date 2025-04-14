@@ -6010,7 +6010,8 @@ def enter_score(none_player=0):
     if sender != my_win.Button_3_mesta:
         if row_num == -1: # значит не выбрана ни одна строка и нажат ентер
             return
-
+    else:
+        fin = "1-й финал"
     sys = System.select().where(System.title_id == title_id()) 
     if tab_etap == 0: # группы
         stage = "Предварительный"
@@ -11924,7 +11925,7 @@ def setka_16_2_made(fin):
     gamer = titles.gamer
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
     for i in range(0, 86):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -12028,8 +12029,8 @@ def setka_16_2_made(fin):
         fn = ('ALIGN', (i + 1, 0), (i + 1, 85), 'CENTER')
         style.append(fn)
    
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
 
@@ -12865,7 +12866,7 @@ def write_in_setka(data, stage, first_mesto, table):
         key_list = []
         mesta_list = []
         for k in dict_setka.keys():
-            key_list.append(k)
+            key_list.append(k) # список всех номеров встреч, которые сыграны
         for v in mesta_dict.keys():
             mesta_list.append(v) # список номеров встреч за места
         # ======
@@ -12937,6 +12938,8 @@ def write_in_setka(data, stage, first_mesto, table):
                 los = match[4]
             elif c == 0:  # встречи за места
                 row_win = mesta_dict[i]
+                win = match[1]
+                los = match[4]
             c = str(i)
            # цикл создания списков номеров встреч по столбцам новый
             column_dict = {}
@@ -13436,11 +13439,11 @@ def numer_game(num_game, vid_setki):
     #     game_loser = dict_mesta_without_3[index] * -1
     #     snoska.append(game_loser)  
     if num_game in dict_mesta: # если встреча за места
-        index = dict_mesta.index(num_game)
-        snoska = [0, 0]
+        # index = dict_mesta.index(num_game)
+        snoska = [0, 0, (num_game * -1)]
         # для отображения в pdf (встречи с минусом)
-        game_loser = dict_mesta[index] * -1
-        snoska.append(game_loser)
+        # game_loser = dict_mesta[index] * -1
+        # snoska.append((mum_game * -1))
     else:
         game_winner = dict_winner[num_game]  # номер игры победителя
         snoska.append(game_winner)
@@ -13473,9 +13476,9 @@ def score_in_setka(stage, place_3rd):
                     res = result.select().where(Result.tours == place_3rd).get()
                     id_pl1 = player.select().where(Player.full_name == res.player1).get()
                     id_pl2 = player.select().where(Player.full_name == res.player2).get()
-                    short_name_win1 = id_pl1.player
-                    short_name_win2 = id_pl2.player
-                    match = [0, short_name_win1, '', '', short_name_win2]
+                    short_name_win = id_pl1.player
+                    short_name_los = id_pl2.player
+                    match = [0, short_name_win, '', '', short_name_los]
                     dict_setka[num_game] = match
             elif res.winner != "X":
                 id_pl_win = player.select().where(Player.full_name == res.winner).get()
@@ -13492,10 +13495,13 @@ def score_in_setka(stage, place_3rd):
             snoska = numer_game(num_game, vid_setki) # список (номер встречи победителя, номер встречи проигравшего и минус куда идет проигравший в сетке)
             tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
             tmp_match.append(short_name_win)
-            if visible_game == 1: # если счет в партиии
-                tmp_match.append(f'{res.score_in_game} {res.score_win}')
+            if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked():
+                tmp_match.append('') # при два 3 места не писать счет в партии
             else:
-                tmp_match.append(f'{res.score_in_game}')
+                if visible_game == 1: # если счет в партиии
+                    tmp_match.append(f'{res.score_in_game} {res.score_win}')
+                else:
+                    tmp_match.append(f'{res.score_in_game}')
             tmp_match.append(snoska[2])
             tmp_match.append(short_name_los)
             match = tmp_match.copy()
@@ -16079,7 +16085,7 @@ def two_3_place():
         return
     else:
         Result.update(winner=game.player1, loser=game.player2).where(Result.tours == number_game).execute()
-    enter_score()
+    # enter_score()
     player_list = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
     fill_table(player_list)
 
