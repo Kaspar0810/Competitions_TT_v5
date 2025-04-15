@@ -12234,7 +12234,7 @@ def setka_32_full_made(fin):
         first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -12389,8 +12389,8 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -12824,6 +12824,7 @@ def write_in_setka(data, stage, first_mesto, table):
         sys = System.select().where(System.title_id == title_id())
         system = sys.select().where(System.id == id_system).get()
         setka_string = system.label_string
+        s_2 = 0
         if setka_string == "Сетка (с розыгрышем всех мест) на 8 участников":
             col_first = 0
             row_first = 0
@@ -12840,6 +12841,7 @@ def write_in_setka(data, stage, first_mesto, table):
             col_first = 0
             row_first = 2
             place_3rd = 28
+            s_2  = 16
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
@@ -12848,6 +12850,7 @@ def write_in_setka(data, stage, first_mesto, table):
             col_first = 0
             row_first = 2
             place_3rd = 60
+            s_2  = 32
         posev_data = setka_player_after_choice(stage) # игроки 1-ого посева
         all_list = setka_data(stage, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
@@ -12968,23 +12971,12 @@ def write_in_setka(data, stage, first_mesto, table):
             for k in column_dict.keys():
                 num_game_list = column_dict[k]  
                 if str(i) in num_game_list:
-                    if i == 28: # вариант у таблицы 16-2 встреча за 3 место 
+                    if (i == place_3rd and s_2 == 16) or (i == place_3rd and s_2 == 32): # вариант у таблицы 16-2 или 32-2 встреча за 3 место номер столбца
                         col_win = k
                     else: 
                         col_win = k + 1
-                    break
-                    #   if i == 28: # вариант у таблицы 16-2 встреча за 3 место 
-                    #     col_win = k
-                    # else: 
-                    #     col_win = k + 1
-                    
-                # выяснить номер стоблца по сетка 32 минус 2
-                    # if k == column_last - 1:
-                    #     # col_win = k - 1
-                    #     col_win = k + 1
-                    # else:
-                    #     col_win = k + 1
-                    # break
+                    break   
+
             row_los = row_num_los[r]  # строка проигравшего
             score = match[2]  # счет во встречи
             row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
