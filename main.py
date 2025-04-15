@@ -15852,6 +15852,69 @@ def open_close_file(view_file):
     return flag
 
 
+def list_duplicate_family(double_id):
+    """список двойных фамилий"""
+    from reportlab.platypus import Table
+    from sys import platform
+    elements = []
+    story = []
+    n = 0
+    tit = Title.get(Title.id == title_id())
+    pl_list = Player.select().where(Player.title_id == title_id()) # сортировка по региону
+    for pl in double_id:
+        pl = pl_list.select().where(Player.id == pl).get() # сортировка по региону
+        n += 1
+        p = pl.player
+        c = pl.city
+        data = [n, p, c]
+        elements.append(data)
+        
+    short_name = tit.short_name_comp
+    gamer = tit.gamer
+    count = len(double_id)  # количество записей в базе
+    kp = count + 1
+    elements.insert(0, ["№", "Фамилия, Имя", "Город"])
+    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 5.0 * cm), rowHeights=(0.6 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            # ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 10),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+    doc = SimpleDocTemplate(f"{short_name}_player_list_duplicate.pdf", pagesize=A4, 
+                            rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm) # название, вид страницы, размер полей
+    view_file = f"{short_name}_player_list_duplicate.pdf"
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story, onFirstPage=func_zagolovok)
+    if platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
+    change_dir(catalog)
+
+
+
 def double_family():
     """создает список двойных фамилий"""
     double_pl_dict = {}
@@ -15860,40 +15923,59 @@ def double_family():
         id_pl = k.id
         pl_fam_name = k.player
         mark = pl_fam_name.find(" ")
-        pl_fam = pl_fam_name[: mark]
-        double_pl_dict[id_pl] = pl_fam
+        if mark != -1:
+            pl_fam = pl_fam_name[:mark]
+            double_pl_dict[id_pl] = pl_fam
+    double_id = find_duplicate_values(double_pl_dict) # список id игроков двойных фамилий
+    list_duplicate_family(double_id)
 
-    book = op.Workbook()
-    worksheet = book.active
-    names_headers = ["№", "Фамилия, Имя", "Город"]
-    for m in range(1, 4):
-        c =  worksheet.cell(row = 1, column = m)
-        c.value = names_headers[m - 1]
+    # book = op.Workbook()
+    # worksheet = book.active
+    # names_headers = ["№", "Фамилия, Имя", "Город"]
+    # for m in range(1, 4):
+    #     c =  worksheet.cell(row = 1, column = m)
+    #     c.value = names_headers[m - 1]
 
-    k = 2    
-    for pl in players:
-        fio = pl.player
-        gorod = pl.city
-        n = k - 1
-        c1 = worksheet.cell(row = k, column = 1)
-        c1.value = n
-        c2 = worksheet.cell(row = k, column = 2)
-        c2.value = fio
-        c3 = worksheet.cell(row = k, column = 3)
-        c3.value = gorod
+    # k = 2    
+    # for pl in players:
+    #     fio = pl.player
+    #     gorod = pl.city
+    #     n = k - 1
+    #     c1 = worksheet.cell(row = k, column = 1)
+    #     c1.value = n
+    #     c2 = worksheet.cell(row = k, column = 2)
+    #     c2.value = fio
+    #     c3 = worksheet.cell(row = k, column = 3)
+    #     c3.value = gorod
  
-        k += 1
+    #     k += 1
 
-    t_id = Title.get(Title.id == title_id())
+    # t_id = Title.get(Title.id == title_id())
 
-    worksheet.column_dimensions['A'].width = 8
-    worksheet.column_dimensions['B'].width = 25
-    worksheet.column_dimensions['C'].width = 25
+    # worksheet.column_dimensions['A'].width = 8
+    # worksheet.column_dimensions['B'].width = 25
+    # worksheet.column_dimensions['C'].width = 25
    
-    sex = t_id.gamer
-    f_name = f"{sex}_двойные _фамилии.xlsx"
-    filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
-    book.save(filename)
+    # sex = t_id.gamer
+    # f_name = f"{sex}_двойные _фамилии.xlsx"
+    # filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
+    # book.save(filename)
+
+
+def find_duplicate_values(double_pl_dict):
+    double_id = []
+    # Creating reverse dictionary to group keys by their values
+    reverse_dict = {}
+    for key, value in double_pl_dict.items():
+        reverse_dict.setdefault(value, set()).add(key)
+
+    # Finding values with more than one key to find duplicate values
+    duplicate_values = [value for value, keys in reverse_dict.items() if len(keys) > 1]
+    for dv in duplicate_values:
+        id_player = list(reverse_dict[dv])
+        for k in id_player:
+            double_id.append(k)
+    return double_id
 
 
 def check_choice_net(fin):
