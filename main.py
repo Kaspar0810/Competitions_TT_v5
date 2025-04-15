@@ -361,7 +361,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         editMenu = menuBar.addMenu("Редактировать")  # основное
         # меню Печать
         printMenu = menuBar.addMenu("Печать") # основное
-     
+        printMenu.addAction(self.print_double_family_Action)
         # ============ создание подменю
         new_comp.addAction(self.new_comp_Action) # создание титула для повтора мальчики или девочки если одни уже созданы
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
@@ -398,6 +398,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu = printMenu.addMenu("Должники за R")
         print_Menu.addAction(self.print_list_nopay_R_Action)
         print_Menu.addAction(self.print_list_pay_R_Action)
+        # print_Menu.addAction(self.print_double_family_Action)
+
 
         # меню просмотр (последовательность вида в меню)
         view_Menu = menuBar.addMenu("Просмотр")
@@ -450,6 +452,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.print_list_nopay_R_Action = QAction("Список, неоплативших R")
         self.print_list_pay_R_Action = QAction("Список, оплативших R")
+        self.print_double_family_Action = QAction("Двойные фамилии")
 
         self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
         self.vid_edit_Action = QAction("Вид страницы этапов")
@@ -577,6 +580,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.print_list_nopay_R_Action.triggered.connect(self.check_debitor_R)
         self.print_list_pay_R_Action.triggered.connect(self.check_debitor_R)
+        self.print_double_family_Action.triggered.connect(self.duplicate_family)
 
         self.copy_db_Action.triggered.connect(self.import_db)
         # self.delete_copy_db_Action.triggered.connect(self.delete_db_copy)
@@ -755,6 +759,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.tabWidget.setCurrentIndex(7)
         my_win.groupBox_4.hide()
         my_win.tableView.show()
+
+    def duplicate_family(self):
+        """печать списка двойныъх фамилий"""
+        double_family()
+    
+
 
     def exit(self):
         flag = 0
@@ -16322,7 +16332,7 @@ my_win.checkBox_no_play_3.stateChanged.connect(mesto_3_no_play)
 
 
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
-# my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
+
 my_win.Button_3_mesta.clicked.connect(two_3_place)
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
@@ -16339,9 +16349,7 @@ my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет 
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made) # создание титула
 # записывает в базу счет в партии встречи
-my_win.Button_Ok.clicked.connect(enter_score)
-# my_win.Button_Ok_pf.clicked.connect(enter_score)
-# my_win.Button_Ok_fin.clicked.connect(enter_score)
+my_win.Button_Ok.clicked.connect(enter_score) # кнопка ввода счета
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
@@ -16375,7 +16383,6 @@ my_win.Button_players_on_pdf_file.clicked.connect(made_list_players_for_pdf_file
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
-my_win.Button_double_name.clicked.connect(double_family) # создание списка двойных фамилий
 
 
 my_win.Button_pay.clicked.connect(check_pay)
