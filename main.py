@@ -3006,7 +3006,27 @@ def check_age_player(znak, dr):
 
 def dclick_in_listWidget_double():
     """заносит пары игрок в tableWiev"""
-    pass
+    text = my_win.listWidget_double.currentItem().text()
+    ds = len(text)
+    sz = text.index(",")
+    sz1 = text.index(",", sz + 1)
+    fam_name = text[0:sz]
+    znak = fam_name.find(" ")
+    fam = fam_name[:znak]
+    fam = fam.upper()
+    name = fam_name[znak + 1:]
+    name = name.capitalize()
+    city = text[sz + 2:sz1]
+    r = text[sz1 + 1:]
+    a = my_win.r_pl1.text()
+    if a == '':
+        my_win.lineEdit_pl1_double.setText(fam_name)
+        my_win.lineEdit_city_pl1.setText(city)
+        my_win.r_pl1.setText(r)
+    else:
+        my_win.lineEdit_pl2_double.setText(fam_name)
+        my_win.lineEdit_city_pl2.setText(city)
+        my_win.r_pl2.setText(r)
 
 
 def dclick_in_listwidget():
@@ -3229,13 +3249,17 @@ def tab_result():
 
 def tab_double():
     """загружает в зависимости от выбранной вкладке"""
+    sender = my_win.sender()
     my_win.listWidget_double.clear()
     tab_double = my_win.tabWidget_3.currentIndex()
     if tab_double == 0:
         player = Player.select().where(Player.title_id == title_id())
-        txt = my_win.lineEdit_pl1_double.text()
-        if txt == "":
-            my_win.textEdit.clear()
+        if sender == my_win.lineEdit_pl1_double:
+            txt = my_win.lineEdit_pl1_double.text()
+            if txt == "":
+                my_win.textEdit.clear()
+        else:
+            txt = my_win.lineEdit_pl2_double.text() 
         txt = txt.upper()
         pl = player.select().where(Player.player ** f'{txt}%')  # like
         if len(pl) > 0:
@@ -3245,38 +3269,7 @@ def tab_double():
             return
         else:
             my_win.textEdit.setText("Такого спортсмена нет!")
-        # ds = len(txt)
-        # sz = txt.index(",")
-        # sz1 = txt.index(",", sz + 1)
-        # sz2 = txt.index(",", sz1 + 1)
-        # fam_name = txt[0:sz]
-        # znak = fam_name.find(" ")
-        # fam = fam_name[:znak]
-        # fam = fam.upper()
-        # name = fam_name[znak + 1:]
-        # name = name.capitalize()
-        # r = txt[sz + 2:sz1]
-        # bd = txt[sz1 + 2:sz2]
-        # znak = bd.find(".")
-# if tb == 6: # вкладка рейтинг
-#             # if cur_index == 0:
-#             #     player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
-#             # else:
-#             #     player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
-#         else:
-#             for r_list in r_data:
-#                 p = r_list.select()
-#                 if r == 0 :
-#                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
-#                     p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
-#                     if r == 0  and len(p) != 0:
-#                         for pl in p:
-#                             full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
-#                             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-#                         return
-#                     elif r == 0:
-#                         r = 1
-#                         continue
+
 
 def page_double():
     """Включает вкладку -пары- в зависимости от чекбокса на владке -система-"""
@@ -3656,7 +3649,7 @@ def page():
         my_win.resize(1110, 750)
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 250))
-        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 502)) # устанавливает tabWidget_2
+        my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 255, 841, 470)) # устанавливает tabWidget_2
         my_win.groupBox_match_double.setEnabled(True)
         my_win.tabWidget_3.setTabEnabled(0, True)
     elif tb == 5: # вкладка -рейтинг-
@@ -15931,6 +15924,9 @@ def double_family():
     double_id = find_duplicate_values(double_pl_dict) # список id игроков двойных фамилий
     list_duplicate_family(double_id)
 
+
+def schedule_net():
+     my_win.tabWidget_3.setTabEnabled(2, True)
     # book = op.Workbook()
     # worksheet = book.active
     # names_headers = ["№", "Фамилия, Имя", "Город"]
@@ -16060,6 +16056,12 @@ def two_3_place():
         Result.update(winner=game.player1, loser=game.player2).where(Result.tours == number_game).execute()
     player_list = Result.select().where((Result.title_id == title_id()) & (Result.number_group == '1-й финал'))
     fill_table(player_list)
+
+
+def add_double_player_to_list():
+    """добавляет пару в списки"""
+    pass
+
 
 # def proba_pdf():
     # """проба пдф"""
@@ -16208,6 +16210,7 @@ my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.lineEdit_pl1_double.textChanged.connect(tab_double)
+my_win.lineEdit_pl2_double.textChanged.connect(tab_double)
 
 my_win.comboBox_region.currentTextChanged.connect(find_city)
 # comboBox_family_city = QComboBox()
@@ -16375,6 +16378,8 @@ my_win.Button_players_on_pdf_file.clicked.connect(made_list_players_for_pdf_file
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
+my_win.Button_made_schedule.clicked.connect(schedule_net)
+my_win.Button_add_double.clicked.connect(add_double_player_to_list)
 
 
 my_win.Button_pay.clicked.connect(check_pay)
