@@ -398,7 +398,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu = printMenu.addMenu("Должники за R")
         print_Menu.addAction(self.print_list_nopay_R_Action)
         print_Menu.addAction(self.print_list_pay_R_Action)
-        # print_Menu.addAction(self.print_double_family_Action)
 
 
         # меню просмотр (последовательность вида в меню)
@@ -830,6 +829,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             my_win.tabWidget.setCurrentIndex(2)
                             clear_db_before_choice(stage)
                             # === вставить ручной вид жеребьевки
+                            # vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
+                            # vid, ok = QInputDialog.getItem(
+                            #                 my_win, "Жеребьевка", "Выберите режим жеребьевки групп.", vid, 0, False)
                             choice_gr_automat()
                             add_open_tab(tab_page="Результаты")
                             my_win.tabWidget.setCurrentIndex(3)
@@ -1118,19 +1120,6 @@ class StartWindow(QMainWindow, Ui_Form):
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)   
     
-    # def open(self):
-    #     """открытие соревнований из архива"""
-    #     self.close() 
-    #     # my_win.show()
-    #     # my_win.resize(1110, 750)
-    #     last_comp(self)
-    #     flag = check_delete_db()
-    #     if flag == 0 or flag == 1: # flag = 0 не старых баз, flag = 1 была отмена удаления старых баз
-    #         go_to()   
-    #     else:
-    #         delete_db_copy(del_files_list=flag)
-    #         my_win.show()
-
 
     def last_comp(self):
         """открытие последних соревнований"""
@@ -3668,6 +3657,7 @@ def page():
         my_win.groupBox_4.show()
         my_win.resize(1110, 750)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
+        my_win.tableWidget_chioce_group.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 450))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
@@ -6898,6 +6888,7 @@ def choice_gr_automat():
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
     " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
+    msgBox = QMessageBox()
     posev_tmp = {}
     reg_player = {}
     gr_region = {}
@@ -6909,6 +6900,9 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
+    vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
+    vid, ok = QInputDialog.getItem(my_win, "Жеребьевка", "Выберите режим жеребьевки групп.", vid, 0, False)
+    
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
@@ -6921,102 +6915,141 @@ def choice_gr_automat():
         gr_region = posev_group.copy()
         posev[f"{b}_посев"] = gr_region
         posev_group.clear()
-   
+    
     pl_choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.family != "X")).order_by(Choice.rank.desc())
     m = 1  # начальное число посева
     p = 0
     number_poseva = 0  # общий счетчик посева игроков
     reg_list = []
     player_list = []
-    for np in pl_choice:
-        choice = np.get(Choice.id == np)
-        regio_n = choice.region
-        region = regio_n.rstrip()
-        pl_id = choice.player_choice_id
-        reg = Region.select().where(Region.region == region).get()
-        region_id = reg.id 
-        reg_list.append(region_id)
-        player_list.append(pl_id)
-    while number_poseva < total_player:
-        p += 1
-        if number_poseva == 0 or number_poseva % group == 0 :
-            group_list = list(range(1, group + 1))  # получение списка групп с помощью функции range
-        #  +++ вариант с упорядовычинем списка групп в реверси
-            if m % 2 == 0:
-                group_list.sort(reverse = True)
-            else:
-                group_list.sort(reverse = False)
-        # +++++++++++++
-        region_id = reg_list[number_poseva]
-        pl_id = player_list[number_poseva]
-        posev_tmp = posev[f"{m}_посев"]
-
-        if m == 1:  # 1-й посев       
-            posev_tmp[p] = region_id  # создает словарь группа - номер региона
-            number_poseva += 1
-            player_current.append(pl_id)
-            reg_player[pl_id] = number_poseva  # словарь ид игрока его группа при посеве
-            if number_poseva == group:  # если доходит окончания данного посева идет запись в db
-                choice_save(m, player_current, reg_player)
-        else:  # 2-й посев и т.д.
-            current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
-            key_reg_previous = []
-            current = region_player_current(number_poseva, reg_list, group, player_list)  # должен быть получен список текущих регионов посева
-            key_reg_current = current[0]  # номера регионов текущего посева
-            player_current = current[1]  # номера игроков (id)
-
-            for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов уникальный
-                key_reg_previous.append(o)
-            pgt.clear()
-            remains = total_player - number_poseva  # остаток посева
-            finish = 0
-            if remains > group: 
-                finish = group  # если остаток больше кол-во групп
-            else:
-                finish = remains            
-            for y in range(0, finish):
-                group_list_tmp = []  
-                z = key_reg_current[y] # список регионов которые уже были посеяны
-                pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
-
-                if z not in key_reg_previous:  # если нет в списке, то добавляет полный список групп
-                    current_region_group[z] = group_list
+    if vid == "Автоматическая":
+        for np in pl_choice:
+            choice = np.get(Choice.id == np)
+            regio_n = choice.region
+            region = regio_n.rstrip()
+            pl_id = choice.player_choice_id
+            reg = Region.select().where(Region.region == region).get()
+            region_id = reg.id 
+            reg_list.append(region_id)
+            player_list.append(pl_id)
+        while number_poseva < total_player:
+            p += 1
+            if number_poseva == 0 or number_poseva % group == 0 :
+                group_list = list(range(1, group + 1))  # получение списка групп с помощью функции range
+            #  +++ вариант с упорядовычинем списка групп в реверси
+                if m % 2 == 0:
+                    group_list.sort(reverse = True)
                 else:
-                    gr_del = previous_region_group[z]  # список групп где уже есть этот регион
-                    group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
-                    if m % 2 == 0:
-                        group_list_tmp.sort(reverse = True)
-                    else:
-                        group_list_tmp.sort(reverse = False)
-                    r = len(group_list_tmp)
-                    if r == 0:  # если во всех группах уже есть, то начинает опять полный список групп
-                        current_region_group[z] = group_list  # получает словарь со списком групп куда сеять
-                    else:
-                        current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
-                 # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
-            sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
-            current.clear()
-            number_poseva = number_poseva + sv
-        if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
-            if number_poseva == group * m:  # смена направления посева
-                if m % 2 != 0:
-                    start = group
-                    end = 0
-                    step = -1
+                    group_list.sort(reverse = False)
+            # +++++++++++++
+            region_id = reg_list[number_poseva]
+            pl_id = player_list[number_poseva]
+            posev_tmp = posev[f"{m}_посев"]
+
+            if m == 1:  # 1-й посев       
+                posev_tmp[p] = region_id  # создает словарь группа - номер региона
+                number_poseva += 1
+                player_current.append(pl_id)
+                reg_player[pl_id] = number_poseva  # словарь ид игрока его группа при посеве
+                if number_poseva == group:  # если доходит окончания данного посева идет запись в db
+                    choice_save(m, player_current, reg_player)
+            else:  # 2-й посев и т.д.
+                current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
+                key_reg_previous = []
+                current = region_player_current(number_poseva, reg_list, group, player_list)  # должен быть получен список текущих регионов посева
+                key_reg_current = current[0]  # номера регионов текущего посева
+                player_current = current[1]  # номера игроков (id)
+
+                for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов уникальный
+                    key_reg_previous.append(o)
+                pgt.clear()
+                remains = total_player - number_poseva  # остаток посева
+                finish = 0
+                if remains > group: 
+                    finish = group  # если остаток больше кол-во групп
                 else:
-                    start = 0
-                    end = group
-                    step = 1
-                m += 1
-                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
-        else:
-            fill_table_after_choice()
-            with db:  # записывает в систему, что произведена жеребъевка
-                system = System.get(System.id == sys_id)
-                system.choice_flag = True
-                system.save()
-            player_in_table_group_and_write_Game_list_Result(stage)
-        group_list.clear()
+                    finish = remains            
+                for y in range(0, finish):
+                    group_list_tmp = []  
+                    z = key_reg_current[y] # список регионов которые уже были посеяны
+                    pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
+
+                    if z not in key_reg_previous:  # если нет в списке, то добавляет полный список групп
+                        current_region_group[z] = group_list
+                    else:
+                        gr_del = previous_region_group[z]  # список групп где уже есть этот регион
+                        group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
+                        if m % 2 == 0:
+                            group_list_tmp.sort(reverse = True)
+                        else:
+                            group_list_tmp.sort(reverse = False)
+                        r = len(group_list_tmp)
+                        if r == 0:  # если во всех группах уже есть, то начинает опять полный список групп
+                            current_region_group[z] = group_list  # получает словарь со списком групп куда сеять
+                        else:
+                            current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
+                    # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
+                sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
+                current.clear()
+                number_poseva = number_poseva + sv
+            if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
+                if number_poseva == group * m:  # смена направления посева
+                    if m % 2 != 0:
+                        start = group
+                        end = 0
+                        step = -1
+                    else:
+                        start = 0
+                        end = group
+                        step = 1
+                    m += 1
+                    previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
+            else:
+                fill_table_after_choice()
+                with db:  # записывает в систему, что произведена жеребъевка
+                    system = System.get(System.id == sys_id)
+                    system.choice_flag = True
+                    system.save()
+                player_in_table_group_and_write_Game_list_Result(stage)
+            group_list.clear()
+    elif vid == "Ручная":
+        txt_tmp = []
+        my_win.tabWidget.setCurrentIndex(2)
+        # my_win.tableWidget_chioce_group.setCurrentIndex(3)
+        for np in pl_choice:
+            choice = np.get(Choice.id == np)
+            regio_n = choice.region
+            region = regio_n.rstrip()
+            family_player = np.family
+            coach_player = np.coach
+            pl_id = choice.player_choice_id
+            choice_list = [pl_id, family_player, region, coach_player]                                                         
+            player_list.append(choice_list)
+        n = 0
+        for g in player_list:          
+            if n < group:
+                n += 1
+                txt_str = f"{g[1]} - {g[2]} - {g[3]}" 
+                txt_tmp.append(txt_str)
+            else:
+                break
+
+        text_str = (',\n'.join(txt_tmp))
+        tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+        nums = [i for i in range(1, group + 1)] # генератор списка  
+        txt = (','.join(list(map(str, nums))))
+        while True:
+            try:
+                number_group, ok = QInputDialog.getText(my_win, f'Номера групп для посева: {txt}', tx)
+                znak = text_str.find(":")
+                fam_city = text_str[:znak - 7]
+                msgBox.information(my_win, "Жеребьевка участников", f"{family_player} идет на номер группы: {number_group}")
+                number_group = int(number_group)
+                view_table_group_choice(fam_city, number_group, posev) # функция реального просмотра жеребьевки
+            except ValueError:
+                msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                continue
+            
 
 
 # def progress_bar(step_bar):
@@ -7571,6 +7604,35 @@ def sort_region(current_region_posev):
 
 def sortkey(e):
     return e[1]
+
+
+
+def view_table_group_choice(fam_city, number_group, posev):
+    """показ таблицы жеребьевки"""
+    stage = "Предварительный" # менять при ручной жеребьевка пф или игр в круг 
+    sys = System.select().where(System.title_id == title_id())
+    sys_id = sys.select().where(System.stage == stage).get()
+    group = sys_id.total_group
+    max_player = sys_id.max_player
+    # создает таблицу посева групп
+    my_win.tableWidget_chioce_group.setColumnCount(group) # устанавливает колво столбцов
+    my_win.tableWidget_chioce_group.setRowCount(max_player) # кол-во строк (максимальное число игроков в группе)
+    column_label = [f'{i} группа' for i in range(1, group + 1)] # генератор списка
+    my_win.tableWidget_chioce_group.resizeColumnsToContents()
+    for i in range(0, group):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        my_win.tableWidget_chioce_group.showColumn(i)
+        item = QtWidgets.QTableWidgetItem()
+        brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        item.setForeground(brush)
+        my_win.tableWidget_chioce_group.setHorizontalHeaderItem(i, item)
+    my_win.tableWidget_chioce_group.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+ 
+    my_win.tableWidget_chioce_group.setItem(0, number_group, QTableWidgetItem(fam_city)) # (номер строки, номер столбца, значения)
+    my_win.tableWidget_chioce_group.resizeColumnsToContents()  
+    my_win.tableWidget_chioce_group.show()
+
+
 
 
 def view_table_choice(fam_city, number_net, num_id_player):
@@ -12446,7 +12508,7 @@ def setka_32_2_made(fin):
         first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -12624,8 +12686,8 @@ def setka_32_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)

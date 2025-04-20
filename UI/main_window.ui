@@ -4595,8 +4595,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4608,8 +4608,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5221,8 +5221,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5733,8 +5733,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6462,8 +6462,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6529,8 +6529,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7239,7 +7239,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tabWidgetPage1">
      <attribute name="title">
@@ -7513,13 +7513,28 @@
     </widget>
     <widget class="QWidget" name="tabWidgetPage3">
      <attribute name="title">
-      <string>Page</string>
+      <string/>
      </attribute>
      <layout class="QVBoxLayout" name="verticalLayout_27">
       <item>
        <widget class="QTableWidget" name="tableWidget"/>
       </item>
      </layout>
+    </widget>
+    <widget class="QWidget" name="tabWidgetPage4">
+     <attribute name="title">
+      <string/>
+     </attribute>
+     <widget class="QTableWidget" name="tableWidget_chioce_group">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>831</width>
+        <height>361</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
