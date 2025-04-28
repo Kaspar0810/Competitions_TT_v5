@@ -7025,14 +7025,32 @@ def choice_gr_automat():
             pl_id = choice.player_choice_id
             choice_list = [pl_id, family_player, region, coach_player]                                                         
             player_list.append(choice_list)
-        n = 0
-        for g in player_list:          
+        # b = 0
+        k = 1
+        posev_list = []
+        for posev in range(0, total_player):
+            one_player = player_list[posev]
+            txt_tmp.append(one_player)
+            if posev == group * k - 1:
+                posev_tmp = txt_tmp.copy()
+                posev_list.append(posev_tmp)
+                txt_tmp.clear()
+                k += 1
+
+        for g in player_list: 
+            proba = g       
             if n < group:
                 n += 1
-                txt_str = f"{g[1]} - {g[2]} - {g[3]}" 
-                txt_tmp.append(txt_str)
-            else:
-                break
+                # txt_str = f"{g[1]}/{g[2]}/{g[3]}" 
+                # txt_tmp.append(txt_str)   
+                txt_tmp.append(g)
+            posev_tmp = txt_tmp.copy()
+            posev_list.append(posev_tmp)
+            n = 0                  
+            # else:
+            #     posev_tmp = txt_tmp.copy()
+            #     posev_list.append(posev_tmp)
+            #     n = 0
 
         text_str = (',\n'.join(txt_tmp))
         tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
