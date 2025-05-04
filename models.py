@@ -45,7 +45,6 @@ class R_list_d(BaseModel):
         db_table = "r_lists_d"
         order_by = "r_fname"
 
-
 class R1_list_m(BaseModel):
     r1_number = IntegerField()
     r1_list = IntegerField()
@@ -57,7 +56,6 @@ class R1_list_m(BaseModel):
     class Meta:
         db_table = "r1_lists_m"
         order_by = "r1_fname"
-
 
 class R1_list_d(BaseModel):
     r1_number = IntegerField()
@@ -71,14 +69,12 @@ class R1_list_d(BaseModel):
         db_table = "r1_lists_d"
         order_by = "r1_fname"
 
-
 class Region(BaseModel):
     region = CharField()
 
     class Meta:
         db_table = "regions"
         order_by = "region"
-
 
 class City(BaseModel):
     city = CharField()
@@ -87,7 +83,6 @@ class City(BaseModel):
     class Meta:
         db_table = "cities"
         order_by = "city"
-
 
 class Title(BaseModel):
     name = CharField()

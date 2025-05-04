@@ -321,6 +321,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget_2.setTabVisible(0, False) # скрывает ярлыки у tabWidget
         self.tabWidget_2.setTabVisible(1, False)
         self.tabWidget_2.setTabVisible(2, False)
+        self.tabWidget_2.setTabVisible(3, False)
     def closeEvent(self, event):
         # Создание бэкап DB при закрытии формы -main- по нажатию на крестик
         sender = my_win.sender()
@@ -811,7 +812,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     load_combobox_filter_final()
             add_open_tab(tab_page="Результаты")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
-            flag_checking = checking_before_the_draw()
+            flag_checking = checking_before_the_draw() # проверка что все игроки зарегистрировались
             if flag_checking is False:
                 return             
             for stage_sys in system:
@@ -3550,6 +3551,7 @@ def page():
                 index = 0
             elif m in pf_list:
                 my_win.tabWidget_stage.setTabEnabled(1, True)
+                index = 1
             else:
                 my_win.tabWidget_stage.setTabEnabled(2, True)
                 index = 2
@@ -4101,7 +4103,7 @@ def system_competition():
     gamer = tit.gamer
     id_title = tit.id
     # проверка что все спортсмены подтвердились
-    flag_checking = checking_before_the_draw()
+    flag_checking = checking_before_the_draw() # TRUE - подтверждены все спортсмены
     if flag_checking is False:
         return
     flag_system = ready_system() # False система еще не создана 
@@ -4252,7 +4254,7 @@ def system_competition():
             my_win.label_10.setText("1-й этап")
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(True)
-            player = Player.select().where(Player.title_id == title_id())
+            player = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
             count = len(player)
             if count != 0:
                 my_win.tabWidget.setCurrentIndex(2)
@@ -4375,7 +4377,7 @@ def kol_player_in_group():
     flag_visible = my_win.checkBox_visible_game.isChecked()
     kg = my_win.spinBox_kol_group.text()  # количество групп
     score_match = my_win.spinBox.text()
-    player_list = Player.select().where(Player.title_id == title_id())
+    player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
     type_table = "группы"
     count = len(player_list)  # количество записей в базе
     # остаток отделения, если 0, то участники равно делится на группы
@@ -6888,6 +6890,7 @@ def choice_gr_automat():
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
     " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
+    import ast
     msgBox = QMessageBox()
     posev_tmp = {}
     reg_player = {}
@@ -7006,16 +7009,19 @@ def choice_gr_automat():
                     previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
             else:
                 fill_table_after_choice()
-                with db:  # записывает в систему, что произведена жеребъевка
-                    system = System.get(System.id == sys_id)
-                    system.choice_flag = True
-                    system.save()
+                System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, чтожеребьевка сделана
+                # with db:  # записывает в систему, что произведена жеребъевка
+                #     system = System.get(System.id == sys_id)
+                #     system.choice_flag = True
+                #     system.save()
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
     elif vid == "Ручная":
+        my_win.tabWidget.setCurrentIndex(3)
+        my_win.tabWidget_2.setCurrentIndex(3)
+        my_win.tableWidget_chioce_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tableWidget_chioce_group.show()
         txt_tmp = []
-        my_win.tabWidget.setCurrentIndex(2)
-        # my_win.tableWidget_chioce_group.setCurrentIndex(3)
         for np in pl_choice:
             choice = np.get(Choice.id == np)
             regio_n = choice.region
@@ -7025,7 +7031,6 @@ def choice_gr_automat():
             pl_id = choice.player_choice_id
             choice_list = [pl_id, family_player, region, coach_player]                                                         
             player_list.append(choice_list)
-        # b = 0
         k = 1
         posev_list = []
         for posev in range(0, total_player):
@@ -7036,38 +7041,58 @@ def choice_gr_automat():
                 posev_list.append(posev_tmp)
                 txt_tmp.clear()
                 k += 1
+        id_fam_region = []
+        for number_posev in range(0, group): # полный посев
+        # ============== вариант ручной жеребьевки ========
+            txt_tmp.clear()
+            id_fam_region.clear()
+            a = 0
+            while a < group: # создает список отдельного посева
+                ps = posev_list[number_posev]
+                txt_temp = ps[a]
+                txt_str = f"{txt_temp[1]}/{txt_temp[2]}"
+                txt_id_str = f"{txt_temp[0]}/{txt_temp[1]}/{txt_temp[2]}"
+                txt_tmp.append(txt_str)
+                id_fam_region.append(txt_id_str)
+                text_str = (',\n'.join(txt_tmp))
+                a += 1
+        # ===============================================
+            if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
+                nums = [i for i in range(1, group + 1)] # генератор списка
+            else:
+                nums = [i for i in range(group, 0, -1)] # генератор списка 
 
-        for g in player_list: 
-            proba = g       
-            if n < group:
-                n += 1
-                # txt_str = f"{g[1]}/{g[2]}/{g[3]}" 
-                # txt_tmp.append(txt_str)   
-                txt_tmp.append(g)
-            posev_tmp = txt_tmp.copy()
-            posev_list.append(posev_tmp)
-            n = 0                  
-            # else:
-            #     posev_tmp = txt_tmp.copy()
-            #     posev_list.append(posev_tmp)
-            #     n = 0
-
-        text_str = (',\n'.join(txt_tmp))
-        tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
-        nums = [i for i in range(1, group + 1)] # генератор списка  
-        txt = (','.join(list(map(str, nums))))
-        while True:
-            try:
-                number_group, ok = QInputDialog.getText(my_win, f'Номера групп для посева: {txt}', tx)
-                znak = text_str.find(":")
-                fam_city = text_str[:znak - 7]
-                msgBox.information(my_win, "Жеребьевка участников", f"{family_player} идет на номер группы: {number_group}")
+            for player_in_group in range(0, group): # внутренний посев
+                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+                txt = (','.join(list(map(str, nums))))
+                number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
                 number_group = int(number_group)
-                view_table_group_choice(fam_city, number_group, posev) # функция реального просмотра жеребьевки
-            except ValueError:
-                msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
-                continue
-            
+                number_correct = False # группа введена не правильно
+                if number_group in nums:
+                    number_correct = True # группа введена правильно
+                while not number_correct: # проверка на правильность ввода
+                    if int(number_group) not in nums:
+                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                    else:
+                        number_correct = True
+                        continue
+                    number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
+                number_group = int(number_group)
+                znak = text_str.find(",")
+                fam_city = text_str[:znak]
+                msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}")                    
+                id_fam = id_fam_region[player_in_group]
+                view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
+                nums.remove(number_group) # удаляет посеянную группу
+                text_str = text_str.replace(f'{fam_city},', '')
+                
+        msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+        System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+        fill_table_after_choice()
+        player_in_table_group_and_write_Game_list_Result(stage)
+        # my_win.tabWidget.setCurrrentIndex(1)
+        
+        
 
 
 # def progress_bar(step_bar):
@@ -7625,7 +7650,7 @@ def sortkey(e):
 
 
 
-def view_table_group_choice(fam_city, number_group, posev):
+def view_table_group_choice(id_fam, number_group, number_posev):
     """показ таблицы жеребьевки"""
     stage = "Предварительный" # менять при ручной жеребьевка пф или игр в круг 
     sys = System.select().where(System.title_id == title_id())
@@ -7645,10 +7670,22 @@ def view_table_group_choice(fam_city, number_group, posev):
         item.setForeground(brush)
         my_win.tableWidget_chioce_group.setHorizontalHeaderItem(i, item)
     my_win.tableWidget_chioce_group.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
- 
-    my_win.tableWidget_chioce_group.setItem(0, number_group, QTableWidgetItem(fam_city)) # (номер строки, номер столбца, значения)
-    my_win.tableWidget_chioce_group.resizeColumnsToContents()  
+    znak = id_fam.find("\n")
+    znak_1 = id_fam.find("/")
+    id_pl = id_fam[:znak_1] # получение id игрока
+    if znak == 0:
+        fam_region = id_fam[1:]
+    else:
+        fam_region = id_fam
+    fam_region = fam_region.replace(f'{id_pl}/', '') # удаляет из строки id игрока
+    fam_region = fam_region.replace('/', '\n') 
+    num_group = f'{number_group} группа'
+    Choice.update(posev_group=number_posev + 1, group=num_group).where(Choice.player_choice == id_pl).execute() # записывает в Choice
+    my_win.tableWidget_chioce_group.setItem(number_posev, number_group - 1, QTableWidgetItem(fam_region)) # (номер строки, номер столбца, значения)
+    my_win.tableWidget_chioce_group.resizeColumnsToContents() # растягивает ячейку по ширине
+    my_win.tableWidget_chioce_group.resizeRowsToContents()  # растягивает ячейку по высоте
     my_win.tableWidget_chioce_group.show()
+
 
 
 
@@ -8777,7 +8814,7 @@ def change_player_between_group_after_draw():
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
-    players = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id())
+    players = Player.select().order_by(Player.rank.desc()).where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
     choice = Choice.select().where(Choice.title_id == title_id())
     if len(choice) != 0:
         for i in choice:
@@ -9690,9 +9727,11 @@ def clear_db_before_choice(stage):
     """очищает систему перед повторной жеребьевкой и изменяет кол-во участников если они изменились"""
     msgBox = QMessageBox
     sys = System.select().where(System.title_id == title_id())
-    player = Player.select().where(Player.title_id == title_id())
-    system = sys.select().where(System.stage == "Предварительный").get()
-    sys_id = system.id
+    player = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
+    id_system = system_id(stage)
+    # system = sys.select().where(System.stage == "Предварительный").get()
+    system = sys.select().where(System.id == id_system).get()
+    # sys_id = system.id
     tg = system.total_group
     total_player = system.total_athletes
     max_pl = system.max_player
@@ -9720,7 +9759,7 @@ def clear_db_before_choice(stage):
                 skg = int((((p_min * (p_min - 1)) / 2 * g1) + ((p_max * (p_max - 1)) / 2 * e1)))
                 max_pl = p_max
             kgs = f"{skg} игр"
-            sys_t = System.select().where(System.id == sys_id).get()
+            sys_t = System.select().where(System.id == id_system).get()
             sys_t.max_player = max_pl
             sys_t.label_string = stroka_kol_group
             sys_t.kol_game_string = kgs
@@ -9731,8 +9770,8 @@ def clear_db_before_choice(stage):
                 x.save()
     # else:  # если число спортсменов не изменилось (просто смена участников)
     gl = Game_list.select().where(Game_list.title_id == title_id())
-    system_id = sys.select().where(System.stage == stage).get()
-    gamelists = gl.select().where(Game_list.system_id == system_id)
+    # system_id = sys.select().where(System.stage == stage).get()
+    gamelists = gl.select().where(Game_list.system_id == id_system)
     for i in gamelists:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
@@ -14277,7 +14316,7 @@ def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребьевке"""
     posev_data = []
     choice_group = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == num_gr))
-    players = Player.select().where(Player.title_id == title_id())
+    players = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
     for posev in choice_group:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
         city = pl.city
