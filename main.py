@@ -7057,42 +7057,53 @@ def choice_gr_automat():
                 text_str = (',\n'.join(txt_tmp))
                 a += 1
         # ===============================================
-            if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
-                nums = [i for i in range(1, group + 1)] # генератор списка
+            if number_posev == 0: # 1-й посев сразу записывает в таблицу
+                number_group = 0
+                for player_in_group in range(0, group): # внутренний посев 
+                        number_group += 1
+                        id_fam = id_fam_region[player_in_group]
+                        view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
             else:
-                nums = [i for i in range(group, 0, -1)] # генератор списка 
+                if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
+                    nums = [i for i in range(1, group + 1)] # генератор списка
+                else:
+                    nums = [i for i in range(group, 0, -1)] # генератор списка 
 
-            for player_in_group in range(0, group): # внутренний посев
-                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
-                txt = (','.join(list(map(str, nums))))
-                number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-                number_group = int(number_group)
-                number_correct = False # группа введена не правильно
-                if number_group in nums:
-                    number_correct = True # группа введена правильно
-                while not number_correct: # проверка на правильность ввода
-                    if int(number_group) not in nums:
-                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
-                    else:
-                        number_correct = True
-                        continue
+                for player_in_group in range(0, group): # внутренний посев
+                    tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+                    txt = (','.join(list(map(str, nums))))
                     number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-                number_group = int(number_group)
-                znak = text_str.find(",")
-                fam_city = text_str[:znak]
-                msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}")                    
-                id_fam = id_fam_region[player_in_group]
-                view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
-                nums.remove(number_group) # удаляет посеянную группу
-                text_str = text_str.replace(f'{fam_city},', '')
-                
+                    number_group = int(number_group)
+                    number_correct = False # группа введена не правильно
+                    if number_group in nums:
+                        number_correct = True # группа введена правильно
+                    while not number_correct: # проверка на правильность ввода
+                        if int(number_group) not in nums:
+                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                        else:
+                            number_correct = True
+                            continue
+                        number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
+                    number_group = int(number_group)
+                    znak = text_str.find(",")
+                    fam_city = text_str[:znak]
+                    msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}")                    
+                    id_fam = id_fam_region[player_in_group]
+                    view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
+                    nums.remove(number_group) # удаляет посеянную группу
+                    text_str = text_str.replace(f'{fam_city},', '')
+                    
+
         msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+
         System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
         fill_table_after_choice()
         player_in_table_group_and_write_Game_list_Result(stage)
         # my_win.tabWidget.setCurrrentIndex(1)
         
-        
+def out_red(text):
+    "\033[34m{}".format(text)
+    return(text)      
 
 
 # def progress_bar(step_bar):
