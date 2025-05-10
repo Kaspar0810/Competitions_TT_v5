@@ -165,8 +165,20 @@ class MyTableModel(QAbstractTableModel):
                             return QtGui.QBrush(QtCore.Qt.darkGreen)
                         else:
                             return QtGui.QBrush(QtCore.Qt.black)
-
-
+            # elif index.column() == 2 and tb == 3: # выделяет совпадающие регионы при жеребьевки групп
+            #     # if my_win.checkBox_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
+            #     # ind = my_win.comboBox_filter_number_group_final.currentIndex()
+            #     if ind > 0: # значит выбран номер группы
+            #         n_gr = my_win.comboBox_filter_number_group_final.currentText()
+            #         region_group_list = dupl_regions(n_gr)
+            #         p = 0
+            #         for l in region_group_list:
+            #             if val == l:
+            #                 p += 1
+            #         if p > 1:    
+            #             return QtGui.QBrush(QtCore.Qt.darkGreen)
+            #         else:
+            #             return QtGui.QBrush(QtCore.Qt.black)
 
 
 
@@ -6996,7 +7008,7 @@ def choice_gr_automat():
                     previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
             else:
                 fill_table_after_choice()
-                System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, чтожеребьевка сделана
+                System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, что жеребьевка сделана
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
     elif vid == "Ручная":
@@ -7065,6 +7077,7 @@ def choice_gr_automat():
                     id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
                 view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
+                # choice_save(m, player_current, reg_player)
             else:
                 if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
                     nums = [i for i in range(1, group + 1)] # генератор списка
@@ -7102,10 +7115,29 @@ def choice_gr_automat():
                     text_str = text_str.replace(f'{fam_city},', '')
                     
         msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-
+        choice_save_manual_group(id_fam_region_list, group)
         System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
         fill_table_after_choice()
         player_in_table_group_and_write_Game_list_Result(stage)
+
+
+def choice_save_manual_group(id_fam_region_list, group):
+    """записывает в таблицу -Choice- результаты ручной жеребьевки"""
+    posev = 0
+    row = 0
+    for l in id_fam_region_list:       
+        if row % 2 == 0:
+            posev += 1
+            for m in range(1, group + 1):
+                txt_str = l[m]
+                mark = txt_str.find("/")
+                id_pl = int(txt_str[:mark]) # id игрока
+                with db:  # запись в таблицу Choice результата жеребъевки
+                    choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.player_choice_id == id_pl)).get()
+                    choice.group = f"{m} группа"
+                    choice.posev_group = posev
+                    choice.save()
+        row += 1
 
 
 def out_red(text):
