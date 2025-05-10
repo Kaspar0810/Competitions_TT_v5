@@ -3613,7 +3613,7 @@ def page():
         # определяет из скольки партий играется этап
         id_system = system_id(stage)
         sys_etap = System.select().where(System.id == id_system).get()
-        sc_flag = sys_etap.score_flag
+        sc_flag = sys_etap.score_flag # из скольки партий играется встреча
         for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и включает в зависмости от сделаной жеребьевки
             score_current = int(i.text())
             if score_current == sc_flag:
@@ -3621,7 +3621,7 @@ def page():
                 break
 
         # my_win.label_result.setText(f"{stage_current} этап")
-        game_visible = sys_etap.visible_game
+        game_visible = sys_etap.visible_game # если False, то счет в партиях не писать
         my_win.checkBox_4.setChecked(game_visible)
         my_win.checkBox_7.setEnabled(False)
         my_win.checkBox_8.setEnabled(False)
@@ -5010,12 +5010,12 @@ def change_status_visible_and_score_game():
    
     if state_visible is False:
         frame_list = [my_win.frame_three,  my_win.frame_five, my_win.frame_seven]
-        if tab == 3:
-            for k in frame_list:
-                k.setVisible(False)
-            my_win.checkBox_4.setChecked(False)
-            my_win.lineEdit_pl1_score_total.setFocus(True)
-        my_win.label_22.setVisible(False)
+        # if tab == 3:
+        for k in frame_list:
+            k.setVisible(False)
+        my_win.checkBox_4.setChecked(False)
+        my_win.lineEdit_pl1_score_total.setFocus(True)
+    my_win.label_22.setVisible(False)
     systems = system.select().where(System.id == id_system).get()
     with db:
         systems.score_flag = match_current
@@ -5033,28 +5033,28 @@ def visible_field():
     idx = my_win.tableView.currentIndex() # номер выделенной строки
     row_num = idx.row()
 
-    if tab == 3:
-        stage = "Предварительный"
-        system_stage = system.select().where(System.stage == stage).get()
-        state_visible = system_stage.visible_game
-        my_win.checkBox_4.setChecked(state_visible)
-    elif tab == 4:
-        my_win.checkBox_14.setChecked(True)
-        my_win.radioButton_match_10.setChecked(True)
-        state_visible = True
-        match_db = 5
-    else:
-            # устанавливает начальное значение - со счетом ищ 5-ти партий
-        if row_num == -1:
-            my_win.checkBox_visible_game.setChecked(True)
-            my_win.radioButton_match_6.setChecked(True)
-            state_visible = True
-            match_db = 5
-        else:
-            stage = my_win.tableWidget.item(row_num , 2).text() # из какого финала играют встречу
-            system_stage = system.select().where(System.stage == stage).get()
-            match_db = system_stage.score_flag
-            state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+    # if tab == 3:
+    stage = "Предварительный"
+    system_stage = system.select().where(System.stage == stage).get()
+    state_visible = system_stage.visible_game
+    my_win.checkBox_4.setChecked(state_visible)
+    # elif tab == 4:
+    #     my_win.checkBox_14.setChecked(True)
+    #     my_win.radioButton_match_10.setChecked(True)
+    #     state_visible = True
+    #     match_db = 5
+    # else:
+    #         # устанавливает начальное значение - со счетом ищ 5-ти партий
+    #     if row_num == -1:
+    #         my_win.checkBox_visible_game.setChecked(True)
+    #         my_win.radioButton_match_6.setChecked(True)
+    #         state_visible = True
+    #         match_db = 5
+    #     else:
+    #         stage = my_win.tableWidget.item(row_num , 2).text() # из какого финала играют встречу
+    #         system_stage = system.select().where(System.stage == stage).get()
+    #         match_db = system_stage.score_flag
+    #         state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         # ======= записывает изменение в базу данных
    
     if sender == my_win.checkBox_4: # изменяет состояние чекбокса игра со счетом или нет
@@ -5686,26 +5686,13 @@ def check_input_total_score(mark, flag):
     tab = my_win.tabWidget.currentIndex() 
     mark_int = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     if tab == 3:
-        for i in my_win.groupBox_kolvo_vstrech_gr.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+        for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
                 match_current = int(i.text())
                 break
         s1 = my_win.lineEdit_pl1_score_total.text()
         s2 = my_win.lineEdit_pl2_score_total.text()
-    # elif tab == 4:
-    #     for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-    #         if i.isChecked():
-    #             match_current = int(i.text())
-    #             break
-    #     s1 = my_win.lineEdit_pl1_score_total_pf.text()
-    #     s2 = my_win.lineEdit_pl2_score_total_pf.text()
-    # else:
-    #     for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-    #         if i.isChecked():
-    #             match_current = int(i.text())
-    #             break
-    #     s1 = my_win.lineEdit_pl1_score_total_fin.text()
-    #     s2 = my_win.lineEdit_pl2_score_total_fin.text()
+
     if mark in mark_int:
         if flag == 1:
             score_list.append(int(s1))
@@ -6416,8 +6403,8 @@ def string_score_game():
             if (g == 4 and st1 == 4 and st2 == 3):  # из 7-и 4-3
                 winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6},{n7})"
         else:
-            if visible_flag is True:
-                winner_string = f"({st1} : {st2})" 
+            # if visible_flag is True:
+            winner_string = f"{st1} : {st2}" 
             # else:
             #     winner_string = f"{st1} : {st2}"      
         return winner_string
@@ -6476,8 +6463,8 @@ def string_score_game():
                 winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6},{n7})"
             
         else:
-            if visible_flag is True:
-                winner_string = f"({st2} : {st1})"
+            # if visible_flag is True:
+            winner_string = f"{st2} : {st1}"
 
         return winner_string
 
@@ -7010,26 +6997,40 @@ def choice_gr_automat():
             else:
                 fill_table_after_choice()
                 System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, чтожеребьевка сделана
-                # with db:  # записывает в систему, что произведена жеребъевка
-                #     system = System.get(System.id == sys_id)
-                #     system.choice_flag = True
-                #     system.save()
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
     elif vid == "Ручная":
         my_win.tabWidget.setCurrentIndex(3)
         my_win.tabWidget_2.setCurrentIndex(3)
-        my_win.tableWidget_chioce_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tableWidget_chioce_group.show()
+        my_win.tableView_choice_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tableView_choice_group.show()
         txt_tmp = []
+        # получаем список списков чистый для начала жеребьевки
+        id_fam_region_list = []
+        id_fam_region_list_tmp = []
+        id_family_region_list = []
+        psv = 0
+        for n_posev in range(0, (max_player) * 2):
+            psv = n_posev // 2 + 1
+            for player_in_group in range(0, group + 1): # внутренний посев
+                if player_in_group == 0:
+                   id_fam_region_list_tmp.append(psv) 
+                else:
+                    id_fam_region_list_tmp.append("-")
+                
+            id_fam_region_list.append(id_fam_region_list_tmp.copy()) # список списков в который помещаются игроки и регионы согласно жеребьевки
+            id_fam_region_list_tmp.clear()   
+        # ==================================
         for np in pl_choice:
             choice = np.get(Choice.id == np)
             regio_n = choice.region
             region = regio_n.rstrip()
             family_player = np.family
-            coach_player = np.coach
-            pl_id = choice.player_choice_id
-            choice_list = [pl_id, family_player, region, coach_player]                                                         
+            # coach_player = np.coach
+            pl_id = choice.player_choice_id 
+            # full_player_str = f"{pl_id}/{family_player}/{region}/{coach_player}" 
+            full_player_str = f"{pl_id}/{family_player}/{region}" # полные данные спортсмены          
+            choice_list = [full_player_str]                                                         
             player_list.append(choice_list)
         k = 1
         posev_list = []
@@ -7040,36 +7041,38 @@ def choice_gr_automat():
                 posev_tmp = txt_tmp.copy()
                 posev_list.append(posev_tmp)
                 txt_tmp.clear()
-                k += 1
-        id_fam_region = []
+                k += 1        
         for number_posev in range(0, group): # полный посев
-        # ============== вариант ручной жеребьевки ========
+        # ============== вариант ручной жеребьевки ========        
             txt_tmp.clear()
-            id_fam_region.clear()
+            id_family_region_list.clear()
             a = 0
             while a < group: # создает список отдельного посева
-                ps = posev_list[number_posev]
-                txt_temp = ps[a]
-                txt_str = f"{txt_temp[1]}/{txt_temp[2]}"
-                txt_id_str = f"{txt_temp[0]}/{txt_temp[1]}/{txt_temp[2]}"
-                txt_tmp.append(txt_str)
-                id_fam_region.append(txt_id_str)
-                text_str = (',\n'.join(txt_tmp))
+                ps = posev_list[number_posev] # список игроков одного посева
+                txt_temp = ps[a] # один игрок в посеве
+                txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
+                id_family_region_list.append(txt_id_str)
+                text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
                 a += 1
         # ===============================================
-            if number_posev == 0: # 1-й посев сразу записывает в таблицу
+            if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
                 number_group = 0
                 for player_in_group in range(0, group): # внутренний посев 
-                        number_group += 1
-                        id_fam = id_fam_region[player_in_group]
-                        view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
+                    id_fam_region_str = id_family_region_list[player_in_group]
+                    mark = id_fam_region_str.rfind("/")
+                    id_family = id_fam_region_str[:mark] # id и фамилия игрока
+                    region_pl = id_fam_region_str[mark + 1:] # регион игрока
+                    id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
+                    id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
+                view_table_group_choice(id_fam_region_list, max_player) # функция реального просмотра жеребьевки
             else:
                 if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
                     nums = [i for i in range(1, group + 1)] # генератор списка
                 else:
                     nums = [i for i in range(group, 0, -1)] # генератор списка 
 
-                for player_in_group in range(0, group): # внутренний посев
+                # for player_in_group in range(0, group):
+                for player_in_group in range(0, group):  # внутренний посев
                     tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
                     txt = (','.join(list(map(str, nums))))
                     number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
@@ -7087,13 +7090,18 @@ def choice_gr_automat():
                     number_group = int(number_group)
                     znak = text_str.find(",")
                     fam_city = text_str[:znak]
-                    msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}")                    
-                    id_fam = id_fam_region[player_in_group]
-                    view_table_group_choice(id_fam, number_group, number_posev) # функция реального просмотра жеребьевки
+                    msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}") 
+
+                    id_fam_region_str = id_family_region_list[player_in_group]
+                    mark = id_fam_region_str.rfind("/")
+                    id_family = id_fam_region_str[:mark] # id и фамилия игрока
+                    region_pl = id_fam_region_str[mark + 1:] # регион игрока
+                    id_fam_region_list[number_posev * 2][number_group] =  id_family
+                    id_fam_region_list[number_posev * 2 + 1][number_group] =  region_pl
+                    view_table_group_choice(id_fam_region_list, max_player) # функция реального просмотра жеребьевки
                     nums.remove(number_group) # удаляет посеянную группу
                     text_str = text_str.replace(f'{fam_city},', '')
                     
-
         msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
 
         System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
@@ -7661,7 +7669,7 @@ def sortkey(e):
 
 
 
-def view_table_group_choice(id_fam, number_group, number_posev):
+def _view_table_group_choice(id_fam, number_group, number_posev):
     """показ таблицы жеребьевки"""
     stage = "Предварительный" # менять при ручной жеребьевка пф или игр в круг 
     sys = System.select().where(System.title_id == title_id())
@@ -7698,7 +7706,17 @@ def view_table_group_choice(id_fam, number_group, number_posev):
     my_win.tableWidget_chioce_group.show()
 
 
-
+def view_table_group_choice(id_fam_region_list, max_player):
+    """показ таблицы жеребьевки с отдельной строкой регионы"""
+    data = id_fam_region_list
+    model = MyTableModel(data)
+    for k in range(0, max_player * 2, 2):
+        my_win.tableView_choice_group.setSpan(k, 0, 2, 1) # нач строка, нач столбец, кол-во строк, кол-во столбцов
+    my_win.tableView_choice_group.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    my_win.tableView_choice_group.verticalHeader().setDefaultSectionSize(15)
+    my_win.tableView_choice_group.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+    my_win.tableView_choice_group.setModel(model)
+    my_win.tableView_choice_group.show()
 
 
 def view_table_choice(fam_city, number_net, num_id_player):
