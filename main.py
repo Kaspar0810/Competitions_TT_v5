@@ -6911,7 +6911,7 @@ def choice_gr_automat():
     p = 0
     number_poseva = 0  # общий счетчик посева игроков
     reg_list = []
-    player_list = []
+    player_list = [] # список всех игроков в порядке посева
     if vid == "Автоматическая":
         for np in pl_choice:
             choice = np.get(Choice.id == np)
@@ -7064,14 +7064,13 @@ def choice_gr_automat():
                     region_pl = id_fam_region_str[mark + 1:] # регион игрока
                     id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
-                view_table_group_choice(id_fam_region_list, max_player) # функция реального просмотра жеребьевки
+                view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
             else:
                 if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
                     nums = [i for i in range(1, group + 1)] # генератор списка
                 else:
                     nums = [i for i in range(group, 0, -1)] # генератор списка 
 
-                # for player_in_group in range(0, group):
                 for player_in_group in range(0, group):  # внутренний посев
                     tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
                     txt = (','.join(list(map(str, nums))))
@@ -7098,7 +7097,7 @@ def choice_gr_automat():
                     region_pl = id_fam_region_str[mark + 1:] # регион игрока
                     id_fam_region_list[number_posev * 2][number_group] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][number_group] =  region_pl
-                    view_table_group_choice(id_fam_region_list, max_player) # функция реального просмотра жеребьевки
+                    view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
                     nums.remove(number_group) # удаляет посеянную группу
                     text_str = text_str.replace(f'{fam_city},', '')
                     
@@ -7107,8 +7106,8 @@ def choice_gr_automat():
         System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
         fill_table_after_choice()
         player_in_table_group_and_write_Game_list_Result(stage)
-        # my_win.tabWidget.setCurrrentIndex(1)
-        
+
+
 def out_red(text):
     "\033[34m{}".format(text)
     return(text)      
@@ -7701,20 +7700,30 @@ def _view_table_group_choice(id_fam, number_group, number_posev):
     num_group = f'{number_group} группа'
     Choice.update(posev_group=number_posev + 1, group=num_group).where(Choice.player_choice == id_pl).execute() # записывает в Choice
     my_win.tableWidget_chioce_group.setItem(number_posev, number_group - 1, QTableWidgetItem(fam_region)) # (номер строки, номер столбца, значения)
-    my_win.tableWidget_chioce_group.resizeColumnsToContents() # растягивает ячейку по ширине
-    my_win.tableWidget_chioce_group.resizeRowsToContents()  # растягивает ячейку по высоте
+    # my_win.tableWidget_chioce_group.resizeColumnsToContents() # растягивает ячейку по ширине
+    # my_win.tableWidget_chioce_group.resizeRowsToContents()  # растягивает ячейку по высоте
     my_win.tableWidget_chioce_group.show()
 
 
-def view_table_group_choice(id_fam_region_list, max_player):
+def view_table_group_choice(id_fam_region_list, max_player, group):
     """показ таблицы жеребьевки с отдельной строкой регионы"""
+    header_list = []
     data = id_fam_region_list
+    for b in range(1, group + 1):
+        header_list.append(f"{b} группа")
+    header_list.insert(0, "посев")
     model = MyTableModel(data)
-    for k in range(0, max_player * 2, 2):
-        my_win.tableView_choice_group.setSpan(k, 0, 2, 1) # нач строка, нач столбец, кол-во строк, кол-во столбцов
+    model.setHorizontalHeaderLabels(header_list) # список заголовков
     my_win.tableView_choice_group.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    font = my_win.tableView_choice_group.font()
+    font.setPointSize(11)
+    my_win.tableView_choice_group.setFont(font)
+    my_win.tableView_choice_group.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
+    my_win.tableView_choice_group.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
     my_win.tableView_choice_group.verticalHeader().setDefaultSectionSize(15)
     my_win.tableView_choice_group.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+    for k in range(0, max_player * 2, 2):
+        my_win.tableView_choice_group.setSpan(k, 0, 2, 1) # нач строка, нач столбец, кол-во строк, кол-во столбцов
     my_win.tableView_choice_group.setModel(model)
     my_win.tableView_choice_group.show()
 
