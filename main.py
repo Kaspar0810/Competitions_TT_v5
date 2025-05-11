@@ -2699,25 +2699,25 @@ def fill_table_results():
     fill_table(player_list)
 
 
-def fill_table_choice():
-    """заполняет таблицу жеребьевки"""
-    gamer = my_win.lineEdit_title_gamer.text()
-    player_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
-    choice_list = player_choice.dicts().execute()
-    row_count = len(choice_list)  # кол-во строк в таблице
-    if row_count != 0:
-        column_count = len(choice_list[0])  # кол-во столбцов в таблице
-        # вставляет в таблицу необходимое кол-во строк
-        my_win.tableWidget.setRowCount(row_count)
-        for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in range(column_count):
-                item = str(list(choice_list[row].values())[column])
-                my_win.tableWidget.setItem(
-                    row, column, QTableWidgetItem(str(item)))
-        # ставит размер столбцов согласно записям
-        my_win.tableWidget.resizeColumnsToContents()
-        for i in range(0, row_count):  # отсортировывает номера строк по порядку
-            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+# def fill_table_choice():
+#     """заполняет таблицу жеребьевки"""
+#     gamer = my_win.lineEdit_title_gamer.text()
+#     player_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
+#     choice_list = player_choice.dicts().execute()
+#     row_count = len(choice_list)  # кол-во строк в таблице
+#     if row_count != 0:
+#         column_count = len(choice_list[0])  # кол-во столбцов в таблице
+#         # вставляет в таблицу необходимое кол-во строк
+#         my_win.tableWidget.setRowCount(row_count)
+#         for row in range(row_count):  # добавляет данные из базы в TableWidget
+#             for column in range(column_count):
+#                 item = str(list(choice_list[row].values())[column])
+#                 my_win.tableWidget.setItem(
+#                     row, column, QTableWidgetItem(str(item)))
+#         # ставит размер столбцов согласно записям
+#         my_win.tableWidget.resizeColumnsToContents()
+#         for i in range(0, row_count):  # отсортировывает номера строк по порядку
+#             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
 
 def fill_table_after_choice():
@@ -3567,8 +3567,8 @@ def page():
             else:
                 my_win.tabWidget_stage.setTabEnabled(2, True)
                 index = 2
-
-        my_win.tabWidget_stage.setCurrentIndex(index)
+        if len(choice_etap) > 0: # если была жеребьевка этапов, то включает вкладку
+            my_win.tabWidget_stage.setCurrentIndex(index)
         tb_etap = my_win.tabWidget_stage.currentIndex()
 
         Button_view = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -7046,15 +7046,26 @@ def choice_gr_automat():
             player_list.append(choice_list)
         k = 1
         posev_list = []
-        for posev in range(0, total_player):
-            one_player = player_list[posev]
-            txt_tmp.append(one_player)
-            if posev == group * k - 1:
+        # for posev in range(0, total_player):
+        for posev in range(0, group * max_player):
+            if posev < total_player:
+                one_player = player_list[posev]
+                txt_tmp.append(one_player)
+                if posev == group * k - 1:
+                    posev_tmp = txt_tmp.copy()
+                    posev_list.append(posev_tmp)
+                    txt_tmp.clear()
+                    k += 1 
+            else:
+                raznica = (group * max_player) - total_player # разница между количеством групп и участниками в последнем посеве
                 posev_tmp = txt_tmp.copy()
+                for t in range(0, raznica):
+                    posev_tmp.append(["-"])
                 posev_list.append(posev_tmp)
-                txt_tmp.clear()
-                k += 1        
-        for number_posev in range(0, group): # полный посев
+                break
+        all_player = 1      
+        # for number_posev in range(0, group): # полный посев
+        for number_posev in range(0, max_player): # полный посев
         # ============== вариант ручной жеребьевки ========        
             txt_tmp.clear()
             id_family_region_list.clear()
@@ -7077,7 +7088,6 @@ def choice_gr_automat():
                     id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
                 view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
-                # choice_save(m, player_current, reg_player)
             else:
                 if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
                     nums = [i for i in range(1, group + 1)] # генератор списка
@@ -7113,12 +7123,13 @@ def choice_gr_automat():
                     view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
                     nums.remove(number_group) # удаляет посеянную группу
                     text_str = text_str.replace(f'{fam_city},', '')
-                    
-        msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-        choice_save_manual_group(id_fam_region_list, group)
-        System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
-        fill_table_after_choice()
-        player_in_table_group_and_write_Game_list_Result(stage)
+                all_player += 1 
+        if all_player == total_player:   
+            msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+            choice_save_manual_group(id_fam_region_list, group)
+            System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+            fill_table_after_choice()
+            player_in_table_group_and_write_Game_list_Result(stage)
 
 
 def choice_save_manual_group(id_fam_region_list, group):
@@ -9043,20 +9054,6 @@ def load_coach_to_combo():
     #     duplicat = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
     #     return duplicat
 
-# def color_coach_in_tablewidget(duplicat, coach_list):
-#     """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
-#     if duplicat is not None:
-#         num_gr = []
-#         p = 0
-#         for i in coach_list:
-#             p += 1
-#             for n in duplicat:
-#                 if n in i:
-#                     if p not in num_gr:
-#                         num_gr.append(p) 
-#         for k in num_gr:
-#             my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
-
 
 def color_region_in_tableWidget(fg):
     """смена цвета шрифта в QtableWidget -fg- номер группы"""
@@ -9136,7 +9133,6 @@ def hide_show_columns(tb):
     # elif tb == 7:
         # my_win.tableWidget.showColumn(0)
         # my_win.tableWidget.showColumn(1)
-
 
 
 def etap_made(stage):
@@ -9372,9 +9368,8 @@ def control_all_player_in_final(etap, all_sum_player_final):
                                                         "предварительного этапа.\n"
                                                         "Хотите ее сделать сейчас?",
                                         msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
-                # проверка что все спортсмены подтвердились
-                flag_checking = checking_before_the_draw()
+            if result == msgBox.Ok:                
+                flag_checking = checking_before_the_draw() # проверка что все спортсмены подтвердились
                 if flag_checking is False:
                     return
                     
@@ -9771,6 +9766,7 @@ def clear_db_before_edit():
     system = System.select().where(System.title_id == title_id())
     title = Title.select().where(Title.id == title_id()).get()
     gl = Game_list.select().where(Game_list.title_id == title_id())
+    pl = Player.select().where((Player.title_id == title_id()) & (Player.bday == '0000-00-00'))
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
@@ -9782,11 +9778,16 @@ def clear_db_before_edit():
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
+    if len(pl) > 0: # удаляет запись в -Player- если есть крест сетки
+        for i in pl:
+            pl_d = Player.get(Player.id == i)
+            pl_d.delete_instance()
     for i in system:  # удаляет все записи
         i.delete_instance()
     sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
                  label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
                  stage_exit="", mesta_exit="", no_game="").save()
+
     with db:
         # записывает в таблицу -Title- новые открытые вкладки
         title.tab_enabled = "Титул Участники"
