@@ -841,10 +841,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         if reply == msg.Ok:
                             my_win.tabWidget.setCurrentIndex(2)
                             clear_db_before_choice(stage)
-                            # === вставить ручной вид жеребьевки
-                            # vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
-                            # vid, ok = QInputDialog.getItem(
-                            #                 my_win, "Жеребьевка", "Выберите режим жеребьевки групп.", vid, 0, False)
                             choice_gr_automat()
                             add_open_tab(tab_page="Результаты")
                             my_win.tabWidget.setCurrentIndex(3)
@@ -4137,9 +4133,8 @@ def system_competition():
                     my_win, "Системные этапы", "Выберите действия для редактирования", made_list, 0, False) 
             else:
                 return
-            if item_selected == "Изменить всю систему":
-                # очищает таблицы перед новой системой соревнования (system, choice)
-                clear_db_before_edit()
+            if item_selected == "Изменить всю систему":                
+                clear_db_before_edit() # очищает таблицы перед новой системой соревнования (system, choice)
                 tab_enabled(id_title)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
                 flag_system = False # ставит флаг, что система еще не создана
@@ -7046,7 +7041,6 @@ def choice_gr_automat():
             player_list.append(choice_list)
         k = 1
         posev_list = []
-        # for posev in range(0, total_player):
         for posev in range(0, group * max_player):
             if posev < total_player:
                 one_player = player_list[posev]
@@ -7057,20 +7051,18 @@ def choice_gr_automat():
                     txt_tmp.clear()
                     k += 1 
             else:
-                raznica = (group * max_player) - total_player # разница между количеством групп и участниками в последнем посеве
                 posev_tmp = txt_tmp.copy()
-                for t in range(0, raznica):
-                    posev_tmp.append(["-"])
                 posev_list.append(posev_tmp)
                 break
-        all_player = 1      
-        # for number_posev in range(0, group): # полный посев
+        all_player = 0      
         for number_posev in range(0, max_player): # полный посев
         # ============== вариант ручной жеребьевки ========        
             txt_tmp.clear()
             id_family_region_list.clear()
             a = 0
-            while a < group: # создает список отдельного посева
+            count = len(posev_list[number_posev])
+            count_gr = group if number_posev < max_player - 1 else count
+            while a < count_gr: # создает список отдельного посева
                 ps = posev_list[number_posev] # список игроков одного посева
                 txt_temp = ps[a] # один игрок в посеве
                 txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
@@ -7087,49 +7079,59 @@ def choice_gr_automat():
                     region_pl = id_fam_region_str[mark + 1:] # регион игрока
                     id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
+                    all_player += 1 # число игроков, посеянных
                 view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
             else:
                 if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
                     nums = [i for i in range(1, group + 1)] # генератор списка
                 else:
                     nums = [i for i in range(group, 0, -1)] # генератор списка 
-
+                stop = 0
                 for player_in_group in range(0, group):  # внутренний посев
-                    tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
-                    txt = (','.join(list(map(str, nums))))
-                    number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-                    number_group = int(number_group)
-                    number_correct = False # группа введена не правильно
-                    if number_group in nums:
-                        number_correct = True # группа введена правильно
-                    while not number_correct: # проверка на правильность ввода
-                        if int(number_group) not in nums:
-                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
-                        else:
-                            number_correct = True
-                            continue
+                    if all_player == total_player: # если все спортсмены прожеребились  
+                        msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+                        choice_save_manual_group(id_fam_region_list, group)
+                        System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+                        fill_table_after_choice()
+                        player_in_table_group_and_write_Game_list_Result(stage)
+                        break
+                    else:
+                        tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+                        txt = (','.join(list(map(str, nums))))
                         number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-                    number_group = int(number_group)
-                    znak = text_str.find(",")
-                    fam_city = text_str[:znak]
-                    msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}") 
+                        number_group = int(number_group)
+                        number_correct = False # группа введена не правильно
+                        if number_group in nums:
+                            number_correct = True # группа введена правильно
+                        while not number_correct: # проверка на правильность ввода
+                            if int(number_group) not in nums:
+                                msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                            else:
+                                number_correct = True
+                                continue
+                            number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
+                        number_group = int(number_group)
+                        znak = text_str.find(",")
+                        fam_city = text_str[:znak]
+                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер группы: {number_group}") 
 
-                    id_fam_region_str = id_family_region_list[player_in_group]
-                    mark = id_fam_region_str.rfind("/")
-                    id_family = id_fam_region_str[:mark] # id и фамилия игрока
-                    region_pl = id_fam_region_str[mark + 1:] # регион игрока
-                    id_fam_region_list[number_posev * 2][number_group] =  id_family
-                    id_fam_region_list[number_posev * 2 + 1][number_group] =  region_pl
-                    view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
-                    nums.remove(number_group) # удаляет посеянную группу
-                    text_str = text_str.replace(f'{fam_city},', '')
-                all_player += 1 
-        if all_player == total_player:   
-            msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-            choice_save_manual_group(id_fam_region_list, group)
-            System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
-            fill_table_after_choice()
-            player_in_table_group_and_write_Game_list_Result(stage)
+                        id_fam_region_str = id_family_region_list[player_in_group]
+                        mark = id_fam_region_str.rfind("/")
+                        id_family = id_fam_region_str[:mark] # id и фамилия игрока
+                        region_pl = id_fam_region_str[mark + 1:] # регион игрока
+                        id_fam_region_list[number_posev * 2][number_group] =  id_family
+                        id_fam_region_list[number_posev * 2 + 1][number_group] =  region_pl
+                        view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки
+                        nums.remove(number_group) # удаляет посеянную группу
+                        text_str = text_str.replace(f'{fam_city},', '')
+                        all_player += 1 
+                # if all_player == total_player:   
+                #     msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+                #     choice_save_manual_group(id_fam_region_list, group)
+                #     System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+                #     fill_table_after_choice()
+                #     player_in_table_group_and_write_Game_list_Result(stage)
+                #     stop = 1
 
 
 def choice_save_manual_group(id_fam_region_list, group):
@@ -7141,13 +7143,16 @@ def choice_save_manual_group(id_fam_region_list, group):
             posev += 1
             for m in range(1, group + 1):
                 txt_str = l[m]
-                mark = txt_str.find("/")
-                id_pl = int(txt_str[:mark]) # id игрока
-                with db:  # запись в таблицу Choice результата жеребъевки
+                if txt_str == "-":
+                    continue
+                else:
+                    mark = txt_str.find("/")
+                    id_pl = int(txt_str[:mark]) # id игрока
                     choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.player_choice_id == id_pl)).get()
-                    choice.group = f"{m} группа"
-                    choice.posev_group = posev
-                    choice.save()
+                    with db:  # запись в таблицу Choice результата жеребъевки                        
+                        choice.group = f"{m} группа"
+                        choice.posev_group = posev
+                        choice.save()
         row += 1
 
 
