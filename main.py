@@ -7086,7 +7086,6 @@ def choice_gr_automat():
                     nums = [i for i in range(1, group + 1)] # генератор списка
                 else:
                     nums = [i for i in range(group, 0, -1)] # генератор списка 
-                stop = 0
                 for player_in_group in range(0, group):  # внутренний посев
                     if all_player == total_player: # если все спортсмены прожеребились  
                         msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
@@ -7125,13 +7124,13 @@ def choice_gr_automat():
                         nums.remove(number_group) # удаляет посеянную группу
                         text_str = text_str.replace(f'{fam_city},', '')
                         all_player += 1 
-                # if all_player == total_player:   
-                #     msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-                #     choice_save_manual_group(id_fam_region_list, group)
-                #     System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
-                #     fill_table_after_choice()
-                #     player_in_table_group_and_write_Game_list_Result(stage)
-                #     stop = 1
+        if all_player == total_player:   
+            msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+            choice_save_manual_group(id_fam_region_list, group)
+            System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+            fill_table_after_choice()
+            player_in_table_group_and_write_Game_list_Result(stage)
+
 
 
 def choice_save_manual_group(id_fam_region_list, group):
