@@ -3667,7 +3667,6 @@ def page():
         my_win.groupBox_4.show()
         my_win.resize(1110, 750)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
-        my_win.tableWidget_chioce_group.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.tabWidget_2.setGeometry(QtCore.QRect(260, 250, 841, 450))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 689))
@@ -6899,7 +6898,15 @@ def choice_gr_automat():
     step = 0
     vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
     vid, ok = QInputDialog.getItem(my_win, "Жеребьевка", "Выберите режим жеребьевки групп.", vid, 0, False)
-    
+    my_win.tabWidget.setCurrentIndex(3)
+    my_win.tabWidget_2.setCurrentIndex(3)
+    my_win.tableView_choice_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
+    my_win.tableView_choice_group.show()
+    txt_tmp = []
+    # получаем список списков чистый для начала жеребьевки
+    id_fam_region_list = []
+    id_fam_region_list_tmp = []
+    id_family_region_list = []
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
@@ -7006,16 +7013,101 @@ def choice_gr_automat():
                 System.update(choice_flag=1).where(System.id == sys_id).execute() # записывает, что жеребьевка сделана
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
+    elif vid == "Полуавтоматическая":
+        pass
+        # psv = 0
+        # for n_posev in range(0, (max_player) * 2):
+        #     psv = n_posev // 2 + 1
+        #     for player_in_group in range(0, group + 1): # внутренний посев
+        #         if player_in_group == 0:
+        #            id_fam_region_list_tmp.append(psv) 
+        #         else:
+        #             id_fam_region_list_tmp.append("-")
+                
+        #     id_fam_region_list.append(id_fam_region_list_tmp.copy()) # список списков в который помещаются игроки и регионы согласно жеребьевки
+        #     id_fam_region_list_tmp.clear()   
+        # # ==================================
+        # for np in pl_choice:
+        #     choice = np.get(Choice.id == np)
+        #     regio_n = choice.region
+        #     region = regio_n.rstrip()
+        #     family_player = np.family
+        #     # coach_player = np.coach
+        #     pl_id = choice.player_choice_id 
+        #     # full_player_str = f"{pl_id}/{family_player}/{region}/{coach_player}" 
+        #     full_player_str = f"{pl_id}/{family_player}/{region}" # полные данные спортсмены          
+        #     choice_list = [full_player_str]                                                         
+        #     player_list.append(choice_list)
+        # k = 1
+        # posev_list = []
+        # for posev in range(0, group * max_player):
+        #     if posev < total_player:
+        #         one_player = player_list[posev]
+        #         txt_tmp.append(one_player)
+        #         if posev == group * k - 1:
+        #             posev_tmp = txt_tmp.copy()
+        #             posev_list.append(posev_tmp)
+        #             txt_tmp.clear()
+        #             k += 1 
+        #     else:
+        #         posev_tmp = txt_tmp.copy()
+        #         posev_list.append(posev_tmp)
+        #         break
+        # all_player = 0      
+        # for number_posev in range(0, max_player): # полный посев
+        # # ============== вариант ручной жеребьевки ========        
+        #     txt_tmp.clear()
+        #     id_family_region_list.clear()
+        #     a = 0
+        #     count = len(posev_list[number_posev])
+        #     count_gr = group if number_posev < max_player - 1 else count
+        #     while a < count_gr: # создает список отдельного посева
+        #         ps = posev_list[number_posev] # список игроков одного посева
+        #         txt_temp = ps[a] # один игрок в посеве
+        #         txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
+        #         id_family_region_list.append(txt_id_str)
+        #         text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
+        #         a += 1
+        # # ===============================================
+        #     if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
+        #         number_group = 0
+        #         for player_in_group in range(0, group): # внутренний посев 
+        #             id_fam_region_str = id_family_region_list[player_in_group]
+        #             mark = id_fam_region_str.rfind("/")
+        #             id_family = id_fam_region_str[:mark] # id и фамилия игрока
+        #             region_pl = id_fam_region_str[mark + 1:] # регион игрока
+        #             id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
+        #             id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
+        #             all_player += 1 # число игроков, посеянных
+        #         view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки 
+        #     else:
+        #         if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
+        #             nums = [i for i in range(1, group + 1)] # генератор списка
+        #         else:
+        #             nums = [i for i in range(group, 0, -1)] # генератор списка 
+        #         for player_in_group in range(0, group):  # внутренний посев
+        #             if all_player == total_player: # если все спортсмены прожеребились  
+        #                 msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+        #                 choice_save_manual_group(id_fam_region_list, group)
+        #                 System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+        #                 fill_table_after_choice()
+        #                 player_in_table_group_and_write_Game_list_Result(stage)
+        #                 break
+        #             else:
+        #                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+        #                 txt = (','.join(list(map(str, nums))))
+        #                 number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
+        #                 number_group = int(number_group)     
     elif vid == "Ручная":
-        my_win.tabWidget.setCurrentIndex(3)
-        my_win.tabWidget_2.setCurrentIndex(3)
-        my_win.tableView_choice_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tableView_choice_group.show()
-        txt_tmp = []
-        # получаем список списков чистый для начала жеребьевки
-        id_fam_region_list = []
-        id_fam_region_list_tmp = []
-        id_family_region_list = []
+        # my_win.tabWidget.setCurrentIndex(3)
+        # my_win.tabWidget_2.setCurrentIndex(3)
+        # my_win.tableView_choice_group.setGeometry(QtCore.QRect(0, 0, 1000, 550)) # (точка слева, точка сверху, ширина, высота)
+        # my_win.tableView_choice_group.show()
+        # txt_tmp = []
+        # # получаем список списков чистый для начала жеребьевки
+        # id_fam_region_list = []
+        # id_fam_region_list_tmp = []
+        # id_family_region_list = []
         psv = 0
         for n_posev in range(0, (max_player) * 2):
             psv = n_posev // 2 + 1
