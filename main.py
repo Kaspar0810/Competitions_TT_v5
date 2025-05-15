@@ -7014,7 +7014,9 @@ def choice_gr_automat():
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
     elif vid == "Полуавтоматическая":
-        # pass
+        gr_region_dict = {}
+        # gr_region_list = []
+        gr_region_temp = []
         psv = 0
         for n_posev in range(0, (max_player) * 2):
             psv = n_posev // 2 + 1
@@ -7068,22 +7070,34 @@ def choice_gr_automat():
             while a < count_gr: # создает список отдельного посева
                 ps = posev_list[number_posev] # список игроков одного посева
                 txt_temp = ps[a] # один игрок в посеве
+                # отделяет регион
+                txt_region = txt_temp[0]
+                mark = txt_region.rfind("/")
+                region_pl = txt_region[mark + 1:] # регион игрока
+                gr_region_temp.append(region_pl)
+                gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
+                gr_region_temp.clear()
+                # ===============================
                 txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
                 id_family_region_list.append(txt_id_str)
                 text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
                 a += 1
         # ===============================================
-            gr_region_dict = {}
+            
             if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
                 number_group = 0
                 for player_in_group in range(0, group): # внутренний посев 
                     id_fam_region_str = id_family_region_list[player_in_group]
                     mark = id_fam_region_str.rfind("/")
                     id_family = id_fam_region_str[:mark] # id и фамилия игрока
-                    region_pl = id_fam_region_str[mark + 1:] # регион игрока
+                    region_pl = id_fam_region_str[mark + 1:] # регион игрока                    
                     id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
                     id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
                     all_player += 1 # число игроков, посеянных
+                    # создание списка регионов по группам
+                    gr_region_temp.append(region_pl)
+                    gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
+                    gr_region_temp.clear()
                 view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки 
             else: # 2-й посев и следующие
                 # if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
