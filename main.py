@@ -7014,109 +7014,110 @@ def choice_gr_automat():
                 player_in_table_group_and_write_Game_list_Result(stage)
             group_list.clear()
     elif vid == "Полуавтоматическая":
-        gr_region_dict = {}
-        # gr_region_list = []
-        gr_region_temp = []
-        psv = 0
-        for n_posev in range(0, (max_player) * 2):
-            psv = n_posev // 2 + 1
-            for player_in_group in range(0, group + 1): # внутренний посев
-                if player_in_group == 0:
-                   id_fam_region_list_tmp.append(psv) 
-                else:
-                    id_fam_region_list_tmp.append("-")
+        pass
+        # gr_region_dict = {}
+        # # gr_region_list = []
+        # gr_region_temp = []
+        # psv = 0
+        # for n_posev in range(0, (max_player) * 2):
+        #     psv = n_posev // 2 + 1
+        #     for player_in_group in range(0, group + 1): # внутренний посев
+        #         if player_in_group == 0:
+        #            id_fam_region_list_tmp.append(psv) 
+        #         else:
+        #             id_fam_region_list_tmp.append("-")
                 
-            id_fam_region_list.append(id_fam_region_list_tmp.copy()) # список списков в который помещаются игроки и регионы согласно жеребьевки
-            id_fam_region_list_tmp.clear()   
-        # ==================================
-        for np in pl_choice:
-            choice = np.get(Choice.id == np)
-            regio_n = choice.region
-            region = regio_n.rstrip()
-            family_player = np.family
-            # coach_player = np.coach
-            pl_id = choice.player_choice_id 
-            # full_player_str = f"{pl_id}/{family_player}/{region}/{coach_player}" 
-            full_player_str = f"{pl_id}/{family_player}/{region}" # полные данные спортсмены          
-            choice_list = [full_player_str]                                                         
-            player_list.append(choice_list)
-        k = 1
-        posev_list = []
-        for posev in range(0, group * max_player):
-            if posev < total_player:
-                one_player = player_list[posev]
-                txt_tmp.append(one_player)
-                if posev == group * k - 1:
-                    posev_tmp = txt_tmp.copy()
-                    posev_list.append(posev_tmp)
-                    txt_tmp.clear()
-                    k += 1 
-            else:
-                posev_tmp = txt_tmp.copy()
-                posev_list.append(posev_tmp)
-                break
-        all_player = 0      
-        for number_posev in range(0, max_player): # полный посев
-        # ============== вариант ручной жеребьевки ========   
-            if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
-                nums = [i for i in range(1, group + 1)] # генератор списка
-            else:
-                nums = [i for i in range(group, 0, -1)] # генератор списка    
-            txt_tmp.clear()
-            id_family_region_list.clear()
-            a = 0
-            count = len(posev_list[number_posev])
-            count_gr = group if number_posev < max_player - 1 else count
-            while a < count_gr: # создает список отдельного посева
-                ps = posev_list[number_posev] # список игроков одного посева
-                txt_temp = ps[a] # один игрок в посеве
-                # отделяет регион
-                txt_region = txt_temp[0]
-                mark = txt_region.rfind("/")
-                region_pl = txt_region[mark + 1:] # регион игрока
-                gr_region_temp.append(region_pl)
-                gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
-                gr_region_temp.clear()
-                # ===============================
-                txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
-                id_family_region_list.append(txt_id_str)
-                text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
-                a += 1
-        # ===============================================
+        #     id_fam_region_list.append(id_fam_region_list_tmp.copy()) # список списков в который помещаются игроки и регионы согласно жеребьевки
+        #     id_fam_region_list_tmp.clear()   
+        # # ==================================
+        # for np in pl_choice:
+        #     choice = np.get(Choice.id == np)
+        #     regio_n = choice.region
+        #     region = regio_n.rstrip()
+        #     family_player = np.family
+        #     # coach_player = np.coach
+        #     pl_id = choice.player_choice_id 
+        #     # full_player_str = f"{pl_id}/{family_player}/{region}/{coach_player}" 
+        #     full_player_str = f"{pl_id}/{family_player}/{region}" # полные данные спортсмены          
+        #     choice_list = [full_player_str]                                                         
+        #     player_list.append(choice_list)
+        # k = 1
+        # posev_list = []
+        # for posev in range(0, group * max_player):
+        #     if posev < total_player:
+        #         one_player = player_list[posev]
+        #         txt_tmp.append(one_player)
+        #         if posev == group * k - 1:
+        #             posev_tmp = txt_tmp.copy()
+        #             posev_list.append(posev_tmp)
+        #             txt_tmp.clear()
+        #             k += 1 
+        #     else:
+        #         posev_tmp = txt_tmp.copy()
+        #         posev_list.append(posev_tmp)
+        #         break
+        # all_player = 0      
+        # for number_posev in range(0, max_player): # полный посев
+        # # ============== вариант ручной жеребьевки ========   
+        #     if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
+        #         nums = [i for i in range(1, group + 1)] # генератор списка
+        #     else:
+        #         nums = [i for i in range(group, 0, -1)] # генератор списка    
+        #     txt_tmp.clear()
+        #     id_family_region_list.clear()
+        #     a = 0
+        #     count = len(posev_list[number_posev])
+        #     count_gr = group if number_posev < max_player - 1 else count
+        #     while a < count_gr: # создает список отдельного посева
+        #         ps = posev_list[number_posev] # список игроков одного посева
+        #         txt_temp = ps[a] # один игрок в посеве
+        #         # отделяет регион
+        #         txt_region = txt_temp[0]
+        #         mark = txt_region.rfind("/")
+        #         region_pl = txt_region[mark + 1:] # регион игрока
+        #         gr_region_temp.append(region_pl)
+        #         gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
+        #         gr_region_temp.clear()
+        #         # ===============================
+        #         txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
+        #         id_family_region_list.append(txt_id_str)
+        #         text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
+        #         a += 1
+        # # ===============================================
             
-            if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
-                number_group = 0
-                for player_in_group in range(0, group): # внутренний посев 
-                    id_fam_region_str = id_family_region_list[player_in_group]
-                    mark = id_fam_region_str.rfind("/")
-                    id_family = id_fam_region_str[:mark] # id и фамилия игрока
-                    region_pl = id_fam_region_str[mark + 1:] # регион игрока                    
-                    id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
-                    id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
-                    all_player += 1 # число игроков, посеянных
-                    # создание списка регионов по группам
-                    gr_region_temp.append(region_pl)
-                    gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
-                    gr_region_temp.clear()
-                view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки 
-            else: # 2-й посев и следующие
-                # if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
-                #     nums = [i for i in range(1, group + 1)] # генератор списка
-                # else:
-                #     nums = [i for i in range(group, 0, -1)] # генератор списка 
-                for player_in_group in range(0, group):  # внутренний посев
-                    if all_player == total_player: # если все спортсмены прожеребились  
-                        msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
-                        choice_save_manual_group(id_fam_region_list, group)
-                        System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
-                        fill_table_after_choice()
-                        player_in_table_group_and_write_Game_list_Result(stage)
-                        break
-                    else:
-                        tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
-                        txt = (','.join(list(map(str, nums)))) # номера групп
-                        number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
-                        number_group = int(number_group)     
+        #     if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
+        #         number_group = 0
+        #         for player_in_group in range(0, group): # внутренний посев 
+        #             id_fam_region_str = id_family_region_list[player_in_group]
+        #             mark = id_fam_region_str.rfind("/")
+        #             id_family = id_fam_region_str[:mark] # id и фамилия игрока
+        #             region_pl = id_fam_region_str[mark + 1:] # регион игрока                    
+        #             id_fam_region_list[number_posev * 2][player_in_group + 1] =  id_family
+        #             id_fam_region_list[number_posev * 2 + 1][player_in_group + 1] =  region_pl
+        #             all_player += 1 # число игроков, посеянных
+        #             # создание списка регионов по группам
+        #             gr_region_temp.append(region_pl)
+        #             gr_region_dict[player_in_group + 1] = gr_region_temp.copy()
+        #             gr_region_temp.clear()
+        #         view_table_group_choice(id_fam_region_list, max_player, group) # функция реального просмотра жеребьевки 
+        #     else: # 2-й посев и следующие
+        #         # if number_posev % 2 == 0: # меняет направления групп в зависимости от посева
+        #         #     nums = [i for i in range(1, group + 1)] # генератор списка
+        #         # else:
+        #         #     nums = [i for i in range(group, 0, -1)] # генератор списка 
+        #         for player_in_group in range(0, group):  # внутренний посев
+        #             if all_player == total_player: # если все спортсмены прожеребились  
+        #                 msgBox.information(my_win, "Уведомление", "Все спортсмены, распределены по группам.")
+        #                 choice_save_manual_group(id_fam_region_list, group)
+        #                 System.update(choice_flag=1).where(System.id == sys_id).execute() # Отмечает, что ручная жеребьевка выполнена
+        #                 fill_table_after_choice()
+        #                 player_in_table_group_and_write_Game_list_Result(stage)
+        #                 break
+        #             else:
+        #                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите номер группы и нажмите -ОК-"
+        #                 txt = (','.join(list(map(str, nums)))) # номера групп
+        #                 number_group, ok = QInputDialog.getText(my_win, f'Номера групп: {txt}', tx)
+        #                 number_group = int(number_group)     
     elif vid == "Ручная":
         # my_win.tabWidget.setCurrentIndex(3)
         # my_win.tabWidget_2.setCurrentIndex(3)
@@ -13922,7 +13923,7 @@ def rank_in_group(total_score, td, num_gr, stage):
 
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key) # словарь (число очков, номера участников группы у которых они есть)
-    res = [key for key, values in rev_dict.items() if len(values) > 1] # список очки, которых более одного
+    res = [key for key, values in rev_dict.items() if len(values) > 1] # список очки, которых более чем у одного участника
     # сортирует словарь по убыванию очков
     sorted_tuple = {k: total_score[k] for k in sorted(total_score, key=total_score.get, reverse=True)}
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
@@ -13945,10 +13946,10 @@ def rank_in_group(total_score, td, num_gr, stage):
         mesto = 1 + sum(mesta_list)
 
     for f in unique_numbers:  # проходим циклом по уник. значениям
-        num_player = rev_dict.get(f)
+        num_player = rev_dict.get(f) # номера участников в таблице с одинаковым кол-вом очков
         for pl in num_player:
             tr.append(str(pl))  # создает список (встречи игроков)
-        m_new = valuesList.count(f)  # подсчитываем сколько раз оно встречается
+        m_new = valuesList.count(f)  # подсчитываем сколько раз оно встречается (у скольких крутиловка)
 
         if m_new == 1:  # если кол-во очков у одного спортсмена
             # записывает место победителю
@@ -13963,8 +13964,6 @@ def rank_in_group(total_score, td, num_gr, stage):
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0] # список [колво очко, у скольки игроков они есть]
-            # player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
-            #         pg_win, pg_los, pp, pps, stage)
             player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                     pg_win, pg_los, pp, pps, stage)
         elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
@@ -14051,7 +14050,14 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
 
 def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_rank_tmp,
                      tr_all, pp, pg_win, pg_los, x, pps, ps, stage):
-    """крутиловка в крутиловке"""
+    """крутиловка в крутиловке
+    m_new - число спортсменов в крутиловке
+    td - группа
+    tr - номера игроков в группе
+    tr_all - все варианты встреч
+    pp - очки
+    pg_win - список выигранных партий каждого игрока
+    pg_los - список проигранных партий каждого игрока"""
     num_player = []
     id_system = system_id(stage)
     if m_new == 1:
@@ -14067,14 +14073,14 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
         # значения очков и список значения очков и у скольких спортсменов они есть
         z = u[1]
         points_person = z[0]
-        # player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
-        #                                   tr_all, pg_win, pg_los, pp, pps, stage)
         men_of_circle = m_new
         player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                                             pg_win, pg_los, pp, pps, stage)
     elif m_new > 3:
         dict_ratio = {}
-        for k in range(1, m_new + 1):
+        keys_list = list(pg_win.keys())
+        # for k in range(1, m_new + 1):
+        for k in keys_list:
             pg_win[k] = sum(pg_win[k])  # сумма выигранных партий
             pg_los[k] = sum(pg_los[k])  # сумма проигранных партий
             x = pg_win[k] / pg_los[k]
@@ -14097,11 +14103,11 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
             list_uniq.append(list_tmp.copy())
             list_tmp.clear()
 
-        for k in list_uniq:
-            point = k[0] # соотношение
-            total_uniq = k[1] # сколько раз встречается
-            index = v_list.index(k[0])
-            p1 = k_list[index]
+        for m in list_uniq:
+            point = m[0] # соотношение
+            total_uniq = m[1] # сколько раз встречается
+            index = v_list.index(m[0])
+            p1 = k_list[index] # номер игрока в группе 
             if total_uniq == 1:
                 td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
                 td[p1 * 2 - 2][max_person + 3] = point  # очки во встрече победителя
@@ -14118,8 +14124,27 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
                     m_new += 1
                 player_rank_temp = circle_2_player(tr, td, max_person, mesto, num_gr, id_system)
                 player_rank_tmp = player_rank_tmp + player_rank_temp
+                mesto = mesto + m_new # новое место
             elif total_uniq == 3:
-                pass
+                for i in range(len(v_list)):
+                    if v_list[i] == point:
+                        num_pl = k_list[i]
+                        num_player.append(num_pl)
+                tr.clear()
+                m_new = 0
+                for x in num_player:
+                    tr.append(str(x))  # создает список (встречи игроков)
+                    m_new += 1
+                # получает список 1-й уникальные
+                u = summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system)
+                # значения очков и список значения очков и у скольких спортсменов они есть
+                z = u[1]
+                points_person = z[0]
+                men_of_circle = m_new
+                player_rank_temp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
+                    pg_win, pg_los, pp, pps, stage)
+                player_rank_tmp = player_rank_tmp + player_rank_temp
+                mesto = mesto + m_new # новое место
 
     tr_all.clear()
     tr.clear()
@@ -14236,8 +14261,6 @@ def circle_2_player(tr, td, max_person, mesto, num_gr, id_system):
 
 def circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                     pg_win, pg_los, pp, pps, stage):
-# def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
-#                     pg_win, pg_los, pp, pps, stage):
     """в крутиловке 3-и спортсмена
     -pp- словарь (номер игрока, очки)
     -ps- список коэфициентов
