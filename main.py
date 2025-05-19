@@ -11666,12 +11666,14 @@ def setka_8_superfinal(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s8_full_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1  # временный финал для чистой сетки
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s8_full_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     for i in range(0, 40):
-        column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -11752,8 +11754,8 @@ def setka_8_superfinal(fin):
                            ] + ts))
 # === надпись финала
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -11801,10 +11803,12 @@ def setka_8_full_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s8_full_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1  # временный финал для чистой сетки
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s8_full_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     for i in range(0, 40):
         # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -11887,8 +11891,8 @@ def setka_8_full_made(fin):
                            ] + ts))
 # === надпись финала
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -11936,10 +11940,12 @@ def setka_8_2_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s8_2_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1  # временный финал для чистой сетки
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s8_2_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     for i in range(0, 40):
         # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -12026,8 +12032,8 @@ def setka_8_2_made(fin):
                            ] + ts))
 # === надпись финала
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -12070,10 +12076,12 @@ def setka_16_full_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s16_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1  # временный финал для чистой сетки
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     for i in range(0, 69):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -12189,8 +12197,8 @@ def setka_16_full_made(fin):
                            ] + ts))
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -12237,7 +12245,8 @@ def setka_16_2_made(fin):
     sys = System.select().where(System.id == id_system).get()
     max_pl = sys.max_player # максимальное число игроков в сетке  
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
-    fin_title = f'Финальные соревнования.({first_mesto}-{max_pl} место)' # титул на таблице
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     for i in range(0, 86):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -12363,8 +12372,8 @@ def setka_16_2_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=100, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin_title}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -12406,10 +12415,12 @@ def setka_32_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s32_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s32_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     strok = 69
     for i in range(0, strok):
         # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
@@ -12491,8 +12502,8 @@ def setka_32_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')])) 
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====                         
     elements.append(t)
     pv = A4
@@ -12531,14 +12542,15 @@ def setka_32_full_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    #===== выбор чистая
-    if sender != my_win.clear_s32_full_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s32_full_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     strok = 207
     for i in range(0, strok):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -12693,8 +12705,8 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -12711,8 +12723,8 @@ def setka_32_full_made(fin):
                            
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -12751,13 +12763,16 @@ def setka_32_2_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    if sender != my_win.clear_s32_2_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s32_2_Action else 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    last_mesto = max_pl if fin == "1-й финал" else first_mesto + max_pl - 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{last_mesto} место)' # титул на таблице
     strok = 207
     for i in range(0, strok):
-        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -12935,8 +12950,8 @@ def setka_32_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -12952,8 +12967,8 @@ def setka_32_2_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=50, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. Одиночный разряд. {gamer}", h2))
 # ====                       
     elements.append(t)
     pv = A4
