@@ -11352,7 +11352,8 @@ def table_made(pv, stage):
         title = "Финал"
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
-        title = "Предварительный этап"
+        # title = "Предварительный этап"
+        title = "Квалификационные соревнования"
         name_table = f"{short_name}_table_group.pdf"
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
         txt = stage.rfind("-")
@@ -12226,13 +12227,17 @@ def setka_16_2_made(fin):
     elements = []
     data = []
     style = []
-    column = ['']
+    column = ['']    
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
-    gamer = titles.gamer
+    gamer = titles.gamer 
+    id_system = system_id(fin)
+    sys = System.select().where(System.id == id_system).get()
+    max_pl = sys.max_player # максимальное число игроков в сетке  
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
+    fin_title = f'Финальные соревнования.({first_mesto}-{max_pl} место)' # титул на таблице
     for i in range(0, 86):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -12358,8 +12363,8 @@ def setka_16_2_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(f"{fin}. {gamer}", h2))
+            leftIndent=100, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(f"{fin_title}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
