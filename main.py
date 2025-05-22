@@ -12076,7 +12076,7 @@ def setka_16_full_made(fin):
     final = fin
     titles = Title.select().where(Title.id == title_id()).get()
     gamer = titles.gamer
-    id_system = system_id(fin)
+    id_system = system_id(stage=fin)
     sys = System.select().where(System.id == id_system).get()
     max_pl = sys.max_player # максимальное число игроков в сетке
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_Action else 1
