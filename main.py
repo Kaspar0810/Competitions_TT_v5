@@ -4718,10 +4718,12 @@ def player_fin_on_circle(fin):
             player = n.family
             pl_id = n.player_choice_id
             player_id = f"{player}/{pl_id}"
-            if count_exit == 1:
-                fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            else:
-                fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            # проверить выход из группы в финал по кругу с неполными групами
+            fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            # if count_exit == 1:
+            #     fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            # else:
+            #     fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
             nt += 1
     elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
         nt = 1
@@ -5353,10 +5355,10 @@ def delete_player():
                 del_player = Delete_player(player_del_id=player_id, bday=birthday_mod, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                             player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
-            choices = Choice.get(Choice.player_choice_id == player_id)
-            choices.delete_instance()
-        player = Player.get(Player.id == player_id)
-        player.delete_instance() # удаляет игрока из таблицы -PLayer-
+            # choices = Choice.get(Choice.player_choice_id == player_id)
+            # choices.delete_instance()
+        pl_del = Player.get(Player.id == player_id)
+        pl_del.delete_instance() # удаляет игрока из таблицы -PLayer-
 
         my_win.lineEdit_id.clear()
         my_win.lineEdit_Family_name.clear()
@@ -7433,7 +7435,8 @@ def choice_setka_automat(fin, flag, count_exit):
         else: # финалы по сетке начиная со 2-ого и т.д.
             if stage_exit == "Предварительный": # откуда выход в финал
                 if flag == 3:
-                   choice_posev = choice.select().where(Choice.mesto_group == nums[n]) 
+                #    choice_posev = choice.select().where(Choice.mesto_group == nums[n]) 
+                    choice_posev = choice.select().where(Choice.mesto_group.in_(nums)) 
                 else:
                     if count_exit > 1:
                         choice_posev = choice.select().where(Choice.mesto_group == nums[n])
@@ -10495,22 +10498,14 @@ def max_exit_player_out_in_group(exit_stage):
 def no_play():
     """победа по неявке соперника"""
     tb = my_win.tabWidget.currentIndex() 
-    check_gr_pl1 = my_win.checkBox_7.isChecked() 
-    check_gr_pl2 = my_win.checkBox_8.isChecked()
-    check_sf_pl1 = my_win.checkBox_12.isChecked() 
-    check_sf_pl2 = my_win.checkBox_13.isChecked()
-    check_fin_pl1 = my_win.checkBox_9.isChecked() 
-    check_fin_pl2 = my_win.checkBox_10.isChecked()
+    check_pl1 = my_win.checkBox_7.isChecked() 
+    check_pl2 = my_win.checkBox_8.isChecked()
+   
     if tb == 3:
-        if check_gr_pl1 is False and check_gr_pl2 is False:
+        if check_pl1 is False and check_pl2 is False:
             return
-    elif tb == 4:
-        if check_sf_pl1 is False and check_sf_pl2 is False:
-            return
-    elif tb == 5:
-        if check_fin_pl1 is False and check_fin_pl2 is False:
-            return
-    none_player = 1 if check_gr_pl1 is True or check_sf_pl1 is True or check_fin_pl1 is True else 2
+
+    none_player = 1 if check_pl1 is True else 2
     enter_score(none_player)
 
 
@@ -11352,7 +11347,6 @@ def table_made(pv, stage):
         title = "Финал"
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
-        # title = "Предварительный этап"
         title = "Квалификационные соревнования"
         name_table = f"{short_name}_table_group.pdf"
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
@@ -11363,7 +11357,11 @@ def table_made(pv, stage):
     else:
         txt = stage.rfind("-")
         number_fin = stage[:txt]
-        title = stage
+        sys = System.select().where(System.id == id_system).get()
+        max_pl = sys.max_player # максимальное число игроков в сетке  
+        first_mesto = mesto_in_final(fin=stage)
+        last_mesto = max_pl if stage == "1-й финал" else first_mesto + max_pl - 1
+        title = f'Финальные соревнования.({first_mesto}-{last_mesto} место). Одиночный разряд' # титул на таблице
         name_table = f"{short_name}_{number_fin}-final.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     catalog = 1
