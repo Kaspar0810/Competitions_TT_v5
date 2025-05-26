@@ -15785,9 +15785,9 @@ def view_all_page_pdf():
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     rus_name_list = []
-    pdf_file_canot_in_comp_list = ["player_list_payment.pdf", "player_list_debitor.pdf", "begunki"]
+    pdf_file_canot_in_comp_list = ["player_list_payment.pdf", "player_list_debitor.pdf", "begunki", "player_list.pdf"] # список, который игнорируется при составлении файла pdf соревнования
     stage_dict = {"table_group.pdf": "Предварительный",
-                   "player_list.pdf": "Список участников",
+                   "player_list_mesto.pdf": "Список участников по месту",
                    "winners_list.pdf": "Список победителей и призеров",
                    "player_list_alf.pdf": "Список участников по алф",
                    "title.pdf": "Титульный лист",
@@ -15881,9 +15881,10 @@ def made_list_players_for_pdf_file():
     """создание списка по алфавиту"""
     from reportlab.platypus import Table
     story = []  # Список данных таблицы участников
-    elements = []  # Список Заголовки столбцов таблицы
+    # elements = []  # Список Заголовки столбцов таблицы
     tit = Title.get(Title.id == title_id())
     for k in range(0, 2):
+        elements = []  # Список Заголовки столбцов таблицы
         if k == 0:
             player_list_x = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)
         else:
