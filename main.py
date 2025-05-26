@@ -2045,7 +2045,6 @@ def data_title_string():
     ds = datastart[8:10]  # получаем число день из календаря
     ms = datastart[5:7]  # получаем число месяц из календаря
     ys = datastart[0:4]  # получаем число год из календаря
-    # ye = int(dataend[0:4])
     me = dataend[5:7]
     de = dataend[8:10]
     month_st = months_list[int(ms) - 1]
@@ -2063,7 +2062,6 @@ def title_update():
     """обновляет запись титула, если был он изменен"""
     title_str = title_string()
     nm = title_str[0]
-    sr = title_str[1]
     vz = title_str[2]
     ds = title_str[3]
     de = title_str[4]
@@ -2072,20 +2070,10 @@ def title_update():
     sek = title_str[7]
     kr = title_str[8]
     ks = title_str[9]
-    gm = title_str[10]
-    fn = title_str[11]
+ 
+    Title.update(name=nm, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=ref,
+                 kat_ref=kr, secretary=sek, kat_sec=ks).where(Title.id == title_id()).execute()
 
-    nazv = Title.select().order_by(Title.id.desc()).get()
-    nazv.name = nm
-    nazv.vozrast = vz
-    nazv.data_start = ds
-    nazv.data_end = de
-    nazv.mesto = ms
-    nazv.referee = ref
-    nazv.kat_ref = kr
-    nazv.secretary = sek
-    nazv.kat_sec = ks
-    nazv.save()
     title_pdf()
 
 
@@ -4671,139 +4659,143 @@ def player_fin_on_circle(fin):
     if stage_exit != "":
         nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
         count_exit = len(nums) # количество игроков, выходящих в финал
-   
-    # ==== new variant ===
-    player_in_final = system.max_player # количество игроков в финале
+    vid = ["Автоматическая", "Ручная"]
+    vid, ok = QInputDialog.getItem(my_win, "Жеребьевка", "Выберите режим жеребьевки финала по кругу.", vid, 0, False)
+    if vid == "Автоматическая":
+        # ==== new variant ===
+        player_in_final = system.max_player # количество игроков в финале
 
-    # == вариант когда осталось 2 человека
-    if player_in_final == 2:
-        game = 1
-        tour = [['1-2']]
-        kol_tours = len(tour)  # кол-во туров
-    else:
-    # ======================
-        cp = player_in_final - 3
-        tour = tours_list(cp)
-        kol_tours = len(tour)  # кол-во туров
-        game = len(tour[0])  # кол-во игр в туре
-    # ===== получение списка номеров игроков в порядке 1-ого тура
-    k = 0
-    number_tours = []
-    first_tour = tour[0].copy()
-    first_tour.sort()
+        # == вариант когда осталось 2 человека
+        if player_in_final == 2:
+            game = 1
+            tour = [['1-2']]
+            kol_tours = len(tour)  # кол-во туров
+        else:
+        # ======================
+            cp = player_in_final - 3
+            tour = tours_list(cp)
+            kol_tours = len(tour)  # кол-во туров
+            game = len(tour[0])  # кол-во игр в туре
+        # ===== получение списка номеров игроков в порядке 1-ого тура
+        k = 0
+        number_tours = []
+        first_tour = tour[0].copy()
+        first_tour.sort()
 
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[:z])
-        number_tours.append(num)
-        num = int(n[z + 1:])
-        number_tours.append(num)
-    # =======
-    if stage_exit == "Предварительный":
-        choices_fin = choice.select().where(Choice.mesto_group.in_(nums))
-        nt = 1
-        for b in nums:
-            choices_fin = choice.select().where(Choice.mesto_group == b)
-            # =====
-            for m in choices_fin:
-                num_group_text = m.group
-                znak = num_group_text.find(" ")
-                num_gr_int = int(num_group_text[:znak])
-                group_dict[m] = num_gr_int
-                grouplist = sorted(group_dict.items(), key=lambda x: x[1])
-                sortdict = dict(grouplist)
-                choices_fin_sort_by_group = sortdict.keys()
-        # вариант с расстоновкой по 1-му туру
-        for n in choices_fin_sort_by_group:
-            player = n.family
-            pl_id = n.player_choice_id
-            player_id = f"{player}/{pl_id}"
-            # проверить выход из группы в финал по кругу с неполными групами
-            fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            # if count_exit == 1:
-            #     fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            # else:
-            #     fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            nt += 1
-    elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
-        nt = 1
-        for b in nums:
-            choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
-            # ==== вариант перевести текст группы в число а потом отсортировать по группам (выход 1 человек из группы)
-            for m in choices_fin:
-                num_group_text = m.sf_group
-                znak = num_group_text.find(" ")
-                num_gr_int = int(num_group_text[:znak])
-                group_dict[m] = num_gr_int
-                grouplist = sorted(group_dict.items(), key=lambda x: x[1])
-                sortdict = dict(grouplist) # словарь id игрока в choice - номер группы по возрастанию
-                choices_fin_sort_by_group = sortdict.keys()
-            # ========
-        for n in choices_fin_sort_by_group:
-            player = n.family
-            pl_id = n.player_choice_id
-            player_id = f"{player}/{pl_id}"
-            if count_exit == 1:
-                fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            else:
-                sorted_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
-            nt += 1
-        if count_exit > 1:
-            fin_dict = dict(sorted(sorted_dict.items()))
-    else:
-        nt = 1
-        choices_fin = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc()) # сортировка по рейтингу
-        for n in choices_fin:
+        for n in first_tour:
+            z = n.find("-")
+            num = int(n[:z])
+            number_tours.append(num)
+            num = int(n[z + 1:])
+            number_tours.append(num)
+        # =======
+        if stage_exit == "Предварительный":
+            choices_fin = choice.select().where(Choice.mesto_group.in_(nums))
+            nt = 1
+            for b in nums:
+                choices_fin = choice.select().where(Choice.mesto_group == b)
+                # =====
+                for m in choices_fin:
+                    num_group_text = m.group
+                    znak = num_group_text.find(" ")
+                    num_gr_int = int(num_group_text[:znak])
+                    group_dict[m] = num_gr_int
+                    grouplist = sorted(group_dict.items(), key=lambda x: x[1])
+                    sortdict = dict(grouplist)
+                    choices_fin_sort_by_group = sortdict.keys()
+            # вариант с расстоновкой по 1-му туру
+            for n in choices_fin_sort_by_group:
                 player = n.family
                 pl_id = n.player_choice_id
                 player_id = f"{player}/{pl_id}"
-                fin_dict[nt] = player_id
+                # проверить выход из группы в финал по кругу с неполными групами
+                fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+                # if count_exit == 1:
+                #     fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+                # else:
+                #     fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
                 nt += 1
-#========        
-    for nt in range(1, player_in_final + 1):
-        fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
-    # == вариант с циклом по словарю
-    k = 1
-    for l in fin_dict.keys():
-        ps_final = k if count_exit == 1 else l # если выход 1 то по порядку, если более то из списка туров
-        fam = fin_dict[l]
-        id_pl = int(fam[fam.find("/") + 1:])
-        if fin == "Одна таблица":
-            Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+        elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
+            nt = 1
+            for b in nums:
+                choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
+                # ==== вариант перевести текст группы в число а потом отсортировать по группам (выход 1 человек из группы)
+                for m in choices_fin:
+                    num_group_text = m.sf_group
+                    znak = num_group_text.find(" ")
+                    num_gr_int = int(num_group_text[:znak])
+                    group_dict[m] = num_gr_int
+                    grouplist = sorted(group_dict.items(), key=lambda x: x[1])
+                    sortdict = dict(grouplist) # словарь id игрока в choice - номер группы по возрастанию
+                    choices_fin_sort_by_group = sortdict.keys()
+                # ========
+            for n in choices_fin_sort_by_group:
+                player = n.family
+                pl_id = n.player_choice_id
+                player_id = f"{player}/{pl_id}"
+                if count_exit == 1:
+                    fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+                else:
+                    sorted_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+                nt += 1
+            if count_exit > 1:
+                fin_dict = dict(sorted(sorted_dict.items()))
         else:
-            Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
-        game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
-                            title_id=title_id())
-        game_list.save()
-        k += 1         
-    # ==========
-    # исправить если из группы выходят больше 2-ух игроков
-    for r in range(0, kol_tours):
-        round = r + 1
-        tours = tour[r]  # игры тура
-        for d in range(0, game):  # цикл по играм тура
-            match = tours[d]  # матч в туре
-            znak = match.find("-")
-            first = int(match[:znak])  # игрок под номером в группе
-            # игрок под номером в группе
-            second = int(match[znak + 1:])
-            pl1_fam_id = fin_list[first - 1] # фамилия первого игрока /id
-            z = pl1_fam_id.find("/") # находит черту
-            pl1_fam = pl1_fam_id[:z] # отделяет фамилия от ид
-            pl1_id = int(pl1_fam_id[z + 1:])
-            pl1_city = players.select().where(Player.id == pl1_id).get()
-            cit1 = pl1_city.city
-            pl2_fam_id = fin_list[second - 1] # фамилия второго игрока
-            z = pl2_fam_id.find("/")
-            pl2_fam = pl2_fam_id[:z]
-            pl2_id = int(pl2_fam_id[z + 1:])
-            pl2_city = players.select().where(Player.id == pl2_id).get()
-            cit2 = pl2_city.city
-            full_pl1 = f"{pl1_fam}/{cit1}"
-            full_pl2 = f"{pl2_fam}/{cit2}"
-            with db:
-                results = Result(number_group=fin, system_stage="Финальный", player1=full_pl1, player2=full_pl2,
-                                tours=match, title_id=title_id(), round=round, system_id=id_system).save()
+            nt = 1
+            choices_fin = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc()) # сортировка по рейтингу
+            for n in choices_fin:
+                    player = n.family
+                    pl_id = n.player_choice_id
+                    player_id = f"{player}/{pl_id}"
+                    fin_dict[nt] = player_id
+                    nt += 1
+        #========        
+        for nt in range(1, player_in_final + 1):
+            fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
+        # == вариант с циклом по словарю
+        k = 1
+        for l in fin_dict.keys():
+            ps_final = k if count_exit == 1 else l # если выход 1 то по порядку, если более то из списка туров
+            fam = fin_dict[l]
+            id_pl = int(fam[fam.find("/") + 1:])
+            if fin == "Одна таблица":
+                Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+            else:
+                Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+            game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
+                                title_id=title_id())
+            game_list.save()
+            k += 1         
+        # ==========
+        # исправить если из группы выходят больше 2-ух игроков
+        for r in range(0, kol_tours):
+            round = r + 1
+            tours = tour[r]  # игры тура
+            for d in range(0, game):  # цикл по играм тура
+                match = tours[d]  # матч в туре
+                znak = match.find("-")
+                first = int(match[:znak])  # игрок под номером в группе
+                # игрок под номером в группе
+                second = int(match[znak + 1:])
+                pl1_fam_id = fin_list[first - 1] # фамилия первого игрока /id
+                z = pl1_fam_id.find("/") # находит черту
+                pl1_fam = pl1_fam_id[:z] # отделяет фамилия от ид
+                pl1_id = int(pl1_fam_id[z + 1:])
+                pl1_city = players.select().where(Player.id == pl1_id).get()
+                cit1 = pl1_city.city
+                pl2_fam_id = fin_list[second - 1] # фамилия второго игрока
+                z = pl2_fam_id.find("/")
+                pl2_fam = pl2_fam_id[:z]
+                pl2_id = int(pl2_fam_id[z + 1:])
+                pl2_city = players.select().where(Player.id == pl2_id).get()
+                cit2 = pl2_city.city
+                full_pl1 = f"{pl1_fam}/{cit1}"
+                full_pl2 = f"{pl2_fam}/{cit2}"
+                with db:
+                    results = Result(number_group=fin, system_stage="Финальный", player1=full_pl1, player2=full_pl2,
+                                    tours=match, title_id=title_id(), round=round, system_id=id_system).save()
+    else: # ручная расстоновка в финале
+        pass
     with db:
         system.choice_flag = True
         system.save()    
@@ -9993,6 +9985,7 @@ def clear_db_before_choice_final(fin):
     choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.final == stage))
     for i in choice:
         Choice.update(posev_final="").where(Choice.id == i).execute()
+    # System.update(choice_flag=0).where(System.id == id_system).execute() # обновляет запись, что жеребьевка не сделана
 
 
 def clear_db_before_choice_semifinal(stage):

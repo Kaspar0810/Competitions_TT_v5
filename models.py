@@ -10,14 +10,12 @@ class BaseModel(Model):
     class Meta:
         database = db
 
-
 class Coach(BaseModel):
     coach = CharField()
 
     class Meta:
         db_table = "coachs"
         order_by = "coach"
-
 
 class R_list_m(BaseModel):
     r_number = IntegerField()
@@ -30,7 +28,6 @@ class R_list_m(BaseModel):
     class Meta:
         db_table = "r_lists_m"
         order_by = "r_fname"
-
 
 class R_list_d(BaseModel):
     r_number = IntegerField()
