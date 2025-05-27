@@ -3183,15 +3183,17 @@ def tab():
 
 def tab_etap():
     """Включает или выключает вкладки на странице -Результаты-"""
-    # sf_list = ["1-й полуфинал", "2-й полуфинал"]
-    # tab_enabled_list = []
+    stage_list = []
     tab_etap = my_win.tabWidget_stage.currentIndex()
     results = Result.select().where(Result.title_id == title_id())    
     systems = System.select().where(System.title_id == title_id())
+    for st in systems:
+        stage = st.stage
+        stage_list.append(stage)
     tab_result()
     if tab_etap == 0:
         player_list = results.select().where(Result.system_stage == "Предварительный")
-        etap_text = "групповом этапе"
+        etap_text = "квалификации"
         load_combobox_filter_group()
     elif tab_etap == 1:        
         player_list = results.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
@@ -3201,10 +3203,11 @@ def tab_etap():
         player_list = results.select().where(Result.system_stage == "Финальный")
         load_combobox_filter_final()
         etap_text = "финальном этапе"
-        system = systems.select().where(System.stage == "1-й финал").get()
-        flag_3_place = system.no_game
-        if flag_3_place == "3": # отмечает checkBox если не разигрывается 3 место
-            my_win.checkBox_no_play_3.setChecked(True)
+        if "1-й финал" in stage_list:
+            system = systems.select().where(System.stage == "1-й финал").get()
+            flag_3_place = system.no_game
+            if flag_3_place == "3": # отмечает checkBox если не разигрывается 3 место
+                my_win.checkBox_no_play_3.setChecked(True)
     count = len(player_list)
     my_win.label_16.setText(f'Всего в {etap_text}\n{count} игры')
     my_win.label_16.show()
@@ -3415,7 +3418,7 @@ def page():
         my_win.comboBox_table_12.hide()
 
         my_win.spinBox_kol_group.hide()
-        stage = []
+        stage_list = []
         table = []
         game = []
         sum_game = []
@@ -3424,7 +3427,7 @@ def page():
             total_player = i.total_athletes
             if total_player == 0: # если система только начала создаваться
                 return
-            stage.append(i.stage)  # добавляет в список этап
+            stage_list.append(i.stage)  # добавляет в список этап
             table.append(i.label_string)  # добавляет в список система
             game.append(i.kol_game_string)  # добавляет в список кол-во игр
         count = len(stage)
@@ -3434,84 +3437,84 @@ def page():
             txt = int(txt[0:t])
             sum_game.append(txt)
             if i == 0:  # показывает в зависимости от этапов финал, кол-во игр
-                my_win.label_101.setText(stage[0])
+                my_win.label_101.setText(stage_list[0])
                 my_win.label_19.setText(game[0])
                 my_win.label_12.setText(table[0])
                 my_win.label_101.show()
                 my_win.label_12.show()
                 my_win.label_19.show()
             elif i == 1:
-                my_win.label_102.setText(stage[1])
+                my_win.label_102.setText(stage_list[1])
                 my_win.label_27.setText(game[1])
                 my_win.label_etap_2.setText(table[1])
                 my_win.label_102.show()
                 my_win.label_27.show()
                 my_win.label_etap_2.show()
             elif i == 2:
-                my_win.label_103.setText(stage[2])
+                my_win.label_103.setText(stage_list[2])
                 my_win.label_30.setText(game[2])
                 my_win.label_31.setText(table[2])
                 my_win.label_30.show()
                 my_win.label_31.show()
                 my_win.label_103.show()
             elif i == 3:
-                my_win.label_104.setText(stage[3])
+                my_win.label_104.setText(stage_list[3])
                 my_win.label_53.setText(game[3])
                 my_win.label_etap_4.setText(table[3])
                 my_win.label_104.show()
                 my_win.label_53.show()
                 my_win.label_etap_4.show()
             elif i == 4:
-                my_win.label_105.setText(stage[4])
+                my_win.label_105.setText(stage_list[4])
                 my_win.label_58.setText(game[4])
                 my_win.label_etap_5.setText(table[4])
                 my_win.label_105.show()
                 my_win.label_58.show()
                 my_win.label_etap_5.show()
             elif i == 5:
-                my_win.label_106.setText(stage[5])
+                my_win.label_106.setText(stage_list[5])
                 my_win.label_81.setText(game[5])
                 my_win.label_etap_6.setText(table[5])
                 my_win.label_106.show()
                 my_win.label_81.show()
                 my_win.label_etap_6.show()
             elif i == 6:
-                my_win.label_107.setText(stage[6])
+                my_win.label_107.setText(stage_list[6])
                 my_win.label_82.setText(game[6])
                 my_win.label_etap_7.setText(table[6])
                 my_win.label_107.show()
                 my_win.label_82.show()
                 my_win.label_etap_7.show()
             elif i == 7:
-                my_win.label_108.setText(stage[7])
+                my_win.label_108.setText(stage_list[7])
                 my_win.label_83.setText(game[7])
                 my_win.label_etap_8.setText(table[7])
                 my_win.label_108.show()
                 my_win.label_83.show()
                 my_win.label_etap_8.show()
             elif i == 8:
-                my_win.label_109.setText(stage[8])
+                my_win.label_109.setText(stage_list[8])
                 my_win.label_84.setText(game[8])
                 my_win.label_etap_9.setText(table[8])
                 my_win.label_109.show()
                 my_win.label_84.show()
                 my_win.label_etap_9.show()
             elif i == 9:
-                my_win.label_110.setText(stage[9])
+                my_win.label_110.setText(stage_list[9])
                 my_win.label_85.setText(game[9])
                 my_win.label_etap_10.setText(table[9])
                 my_win.label_110.show()
                 my_win.label_85.show()
                 my_win.label_etap_10.show()
             elif i == 10:
-                my_win.label_111.setText(stage[10])
+                my_win.label_111.setText(stage_list[10])
                 my_win.label_86.setText(game[10])
                 my_win.label_etap_11.setText(table[10])
                 my_win.label_111.show()
                 my_win.label_86.show()
                 my_win.label_etap_11.show()
             elif i == 11:
-                my_win.label_112.setText(stage[11])
+                my_win.label_112.setText(stage_list[11])
                 my_win.label_87.setText(game[11])
                 my_win.label_etap_12.setText(table[11])
                 my_win.label_112.show()
@@ -3564,24 +3567,17 @@ def page():
         Button_view.setFlat(True)
         Button_view.show()
         Button_view.clicked.connect(view)
-        # ============= 
-        # vbox = QVBoxLayout()   
-        # Button_3_mesta = QPushButton("Два 3 места") # (в каком виджете размещена)
-        # my_win.vbox.addWidget(Button_3_mesta)
-        # Button_3_mesta.resize(100, 30) # размеры кнопки (длина 120, ширина 50)
-        # Button_3_mesta.move(850, 40) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        # # Button_3_mesta.setText("Два 3 места")
-        # Button_3_mesta.show()
-        # Button_3_mesta.clicked.connect(two_3_place)
+
         # == определяет разигрывается 3-е место или нет и в зависимости от этого включает кнопку и checkBox
-        system = sf.select().where(System.stage == "1-й финал").get()
-        flag_3 = system.no_game
-        if flag_3 == '3':
-            my_win.checkBox_no_play_3.setChecked(True)
-            my_win.Button_3_mesta.setEnabled(True)
-        else:
-            my_win.checkBox_no_play_3.setChecked(False)
-            my_win.Button_3_mesta.setEnabled(False)
+        if "1-й финал" in choice_etap:
+            system = sf.select().where(System.stage == "1-й финал").get()
+            flag_3 = system.no_game
+            if flag_3 == '3':
+                my_win.checkBox_no_play_3.setChecked(True)
+                my_win.Button_3_mesta.setEnabled(True)
+            else:
+                my_win.checkBox_no_play_3.setChecked(False)
+                my_win.Button_3_mesta.setEnabled(False)
         # =============
         Label_view = QLabel(my_win.tabWidget)
         Label_view.resize(150, 80) # размеры кнопки (длина 120, ширина 50)
@@ -3604,7 +3600,7 @@ def page():
             load_combobox_filter_group_semifinal()
         else:  # подвкладка -Финалы-
             load_combobox_filter_final()
-            stage = "1-й финал"
+            stage = "1-й финал" if "1-й финал" in choice_etap else "Одна таблица"
             
         # определяет из скольки партий играется этап
         id_system = system_id(stage)
@@ -3627,7 +3623,7 @@ def page():
         my_win.Button_Ok.setEnabled(False)
         player_list = Result.select().where(Result.system_id == id_system)
         load_combo() # загружает фамилия игроков для поиска
-        visible_field()
+        visible_field(stage)
         fill_table(player_list)
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
@@ -3897,15 +3893,18 @@ def list_player_pdf(player_list):
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
-    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
+    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-              colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
-              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+            #   colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
+              colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
+            #   rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+              rowHeights=(0.4 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
-                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                        #    ('FONTSIZE', (0, 0), (-1, -1), 7),
+                            ('FONTSIZE', (0, 0), (-1, -1), 6),
                            # межстрочный верхний инервал
                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
                            # межстрочный нижний инервал
@@ -5024,7 +5023,7 @@ def change_status_visible_and_score_game():
     return state_visible
 
 
-def visible_field():
+def visible_field(stage):
     """включает или выключает поля для ввода счета, state - игра со счетом, True если включить поля для счета"""
     sender = my_win.sender()
     system = System.select().where(System.title_id == title_id())
@@ -5033,30 +5032,11 @@ def visible_field():
     idx = my_win.tableView.currentIndex() # номер выделенной строки
     row_num = idx.row()
 
-    # if tab == 3:
-    stage = "Предварительный"
+    # stage = "Предварительный"
     system_stage = system.select().where(System.stage == stage).get()
     state_visible = system_stage.visible_game
     my_win.checkBox_4.setChecked(state_visible)
-    # elif tab == 4:
-    #     my_win.checkBox_14.setChecked(True)
-    #     my_win.radioButton_match_10.setChecked(True)
-    #     state_visible = True
-    #     match_db = 5
-    # else:
-    #         # устанавливает начальное значение - со счетом ищ 5-ти партий
-    #     if row_num == -1:
-    #         my_win.checkBox_visible_game.setChecked(True)
-    #         my_win.radioButton_match_6.setChecked(True)
-    #         state_visible = True
-    #         match_db = 5
-    #     else:
-    #         stage = my_win.tableWidget.item(row_num , 2).text() # из какого финала играют встречу
-    #         system_stage = system.select().where(System.stage == stage).get()
-    #         match_db = system_stage.score_flag
-    #         state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        # ======= записывает изменение в базу данных
-   
+        # ======= записывает изменение в базу данных  
     if sender == my_win.checkBox_4: # изменяет состояние чекбокса игра со счетом или нет
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
@@ -11351,7 +11331,7 @@ def table_made(pv, stage):
     short_name = t_id.short_name_comp
 
     if stage == "Одна таблица":
-        title = "Финал"
+        title = "Финальные соревнования. Одиночный разряд"
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
         title = "Квалификационные соревнования"
