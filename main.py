@@ -11244,7 +11244,18 @@ def table_made(pv, stage):
         tblstyle.append(fn)
 
     ts = []
+    ts_grid = []
+    # создание внутренней сетки таблицы (столбец, строка), (столбец, строка) (2, 2) - вид пунктирной линии
+    for p in range(0, max_pl * 2 + 1):
+        if p % 2 == 0:
+            tsg = ('LINEBELOW', (1, p + 2), (-1, p + 2), 0.25, colors.black)
+        else:
+            tsg = ('LINEBELOW', (2, p), (-1, p), 0.25, colors.grey, None, (1, 1)) # пунктирная линия под ячейкой 2-й столбец, 3-я строка (начинается с 0)
+        ts_grid.append(tsg)
+
+
     ts.append(tblstyle)
+    ts.append(ts_grid)
     # ============= полный стиль таблицы ======================
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -11260,8 +11271,11 @@ def table_made(pv, stage):
                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
                      ('LINEABOVE', (0, 0), (-1, 1), 1, colors.black),  # цвет линий нижней
                      # цвет и толщину внутренних линий
-                     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                     ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
+                     ('INNERGRID', (0, 0), (1, -1), 0.25, colors.black),
+
+                     ('LINEAFTER', (1, 0), (-1, -1), 0.25, colors.black)] # линия справа 1-я ячейка (1-й столбец, 0-я строка), 2-я ячейка (1-й столбец, строка до конца) (начинается с 0)
+                    + ts_grid +
+                    [('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
