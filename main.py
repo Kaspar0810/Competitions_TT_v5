@@ -3881,7 +3881,6 @@ def list_player_pdf(player_list):
         p = l.player
         b = l.bday
         b = format_date_for_view(str_date=b)
-        # b = date_formated_on_db_or_form(b_day=b)
         r = l.rank
         c = l.city
         g = l.region
@@ -3899,7 +3898,7 @@ def list_player_pdf(player_list):
             #   colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
               colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
             #   rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
-              rowHeights=(0.4 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+              rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
@@ -3910,14 +3909,15 @@ def list_player_pdf(player_list):
                            # межстрочный нижний инервал
                            ('TOPPADDING', (0, 0), (-1, -1), 1),
                            # вериткальное выравнивание в ячейке заголовка
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                            # горизонтальное выравнивание в ячейке
                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
                            ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
                            ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
                            # цвет и толщину внутренних линий
-                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey, None, (1, 1)),
+                        #    ('LINEBELOW', (0, 0), (-1, -1), 0.02, colors.grey, None, (1, 1)),
                            # внешние границы таблицы
                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
                            ]))
