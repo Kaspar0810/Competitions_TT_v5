@@ -3886,7 +3886,10 @@ def list_player_pdf(player_list):
     n = 0
     for l in player_list:
         n += 1
+        o = l.otchestvo    
         p = l.player
+        if o is not None: # если есть отчество то добавляет к фамилии и имени
+            p = f"{p} {o}"
         b = l.bday
         b = format_date_for_view(str_date=b)
         r = l.rank
@@ -3896,11 +3899,12 @@ def list_player_pdf(player_list):
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
+        
         t = chop_line(t) # разбивает строку тренеров не две если строкка длинная
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
-    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
+    elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
             #   colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
