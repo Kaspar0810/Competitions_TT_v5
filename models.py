@@ -103,7 +103,7 @@ class Title(BaseModel):
         db_table = "titles"
 
 class Player(BaseModel):
-    player = CharField(50)
+    player = CharField(50)    
     bday = DateField()
     rank = IntegerField()
     city = CharField()
@@ -119,6 +119,7 @@ class Player(BaseModel):
     total_game_player = IntegerField()
     total_win_game = IntegerField()
     application = CharField(30)
+    otchestvo = CharField()
    
     class Meta:
         db_table = "players"

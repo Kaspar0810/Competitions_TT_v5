@@ -50,7 +50,7 @@ os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 # screen_rect = app.desktop().screenGeometry()
 # width, height = screen_rect.width(), screen_rect.height()
 # import collections
-# from playhouse.migrate import * # для удаления, редактирования таблиц DB
+from playhouse.migrate import * # для удаления, редактирования таблиц DB
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -2758,7 +2758,15 @@ def add_player():
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     pl_id = my_win.lineEdit_id.text()
-    pl = my_win.lineEdit_Family_name.text()
+    pl_f = my_win.lineEdit_Family_name.text()
+    mark_r = pl_f.rfind(' ') # находит пробел отделяющий отчество
+    mark_l = pl_f.find(' ')    
+    if mark_l == mark_r:
+        otc = "-"
+        pl = pl_f
+    else: # значит стоит отчество
+        otc = pl_f[mark_r +1:] 
+        pl = pl_f[:mark_r]
     bd = my_win.lineEdit_bday.text()
     rn = my_win.lineEdit_R.text()
     ct = my_win.lineEdit_city_list.text()
@@ -2766,7 +2774,7 @@ def add_player():
     rg = rg.strip() # удаляет лишние пробелы
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
-    player_data_list = [pl, bd, rn, ct, rg, rz, ch]
+    player_data_list = [pl, bd, rn, ct, rg, rz, ch, otc]
     for i in player_data_list:
         if i == "":
             result = msgBox.information(my_win, "", "Вы заполнили не все поля данными игрока.",
@@ -2816,7 +2824,7 @@ def add_player():
             bd_mod = f"{year}-{monh}-{days}"
             plr = Player(player=pl, bday=bd_mod, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
-                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0, otchestvo=otc).save()
                          
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
@@ -2843,9 +2851,9 @@ def add_player():
             bd_new = format_date_for_db(str_date=bd)
             # =======
             with db:
-                player = Player(player=pl, bday=bd_new, rank=rn, city=ct, region=rg, razryad=rz,
+                players = Player(player=pl, bday=bd_new, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
-                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka, otchestvo=otc).save()
             player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
             count_pred = len(player_predzayavka)
             my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
@@ -16486,29 +16494,30 @@ def proba():
 # def proba():
 #     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
  
-# #creating the cursor object 
-#     cur = myconn.cursor() 
-#     try: 
-#         #adding a column branch name to the table Employee 
-#         cur.execute("ALTER TABLE Game_list MODIFY COLUMN player_group_id VARCHAR(30) NULL;") 
-#     except: 
-#         myconn.rollback() 
+# # #creating the cursor object 
+# #     cur = myconn.cursor() 
+# #     try: 
+# #         #adding a column branch name to the table Employee 
+# #         cur.execute("ALTER TABLE Game_list MODIFY COLUMN player_group_id VARCHAR(30) NULL;") 
+# #     except: 
+# #         myconn.rollback() 
     
-#     myconn.close() 
+# #     myconn.close() 
 
-    # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
-#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-    # my_db = SqliteDatabase('comp_db.db')
-    # migrator = SqliteMigrator(my_db)
-    # no_game = TextField(default="")
-    # mesto_super_final = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
-    # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
+#     # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
+# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+#     # my_db = SqliteDatabase('comp_db.db')
+#     migrator = MySQLMigrator(db)
+#     # no_game = TextField(default="")
+#     otchestvo = CharField(null=True)  # новый столбец, его поле и значение по умолчанию
+    
+#     # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
 
-    # with db:
-    #     migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-        # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-        # migrate(migrator.add_column('Choices', 'mesto_super_final', mesto_super_final)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#     # with db:
+#     #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
+#     #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#     #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
+#     migrate(migrator.add_column('players', 'otchestvo', otchestvo)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
