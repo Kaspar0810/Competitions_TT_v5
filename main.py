@@ -395,6 +395,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ed_Menu.addAction(self.ed_etap_Action)
 
         editMenu.addAction(self.vid_edit_Action)  #в осн меню -Редактировать- добавлен пункт сразу с акцией -Вид страницы этапов
+        editMenu.addAction(self.indent_edit_Action)
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")  # основное
         rank_Menu.addAction(self.rAction)
@@ -468,6 +469,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
         self.vid_edit_Action = QAction("Вид страницы этапов")
+        self.indent_edit_Action = QAction("Изменить отступ в PDF")
 
         self.choice_one_table_Action = QAction("Одна таблица")
         # подменю жеребьевка -группы-
@@ -544,6 +546,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_made)
         self.vid_edit_Action.triggered.connect(self.vid_edit)
+        self.indent_edit_Action.triggered.connect(self.indent_edit)
         self.exitAction.triggered.connect(self.exit)
         self.choice_one_table_Action.triggered.connect(self.choice)
         self.choice_gr_Action.triggered.connect(self.choice)
@@ -1014,6 +1017,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def vid_edit(self):
         change_page_vid()
+
+    
+    def indent_edit(self):
+        change_indent_page()
 
     def print_clear(self):
         """Печать чистых таблиц"""
@@ -3438,12 +3445,12 @@ def page():
             stage_list.append(i.stage)  # добавляет в список этап
             table.append(i.label_string)  # добавляет в список система
             game.append(i.kol_game_string)  # добавляет в список кол-во игр
-        count = len(stage)
+        count = len(stage_list)
         for i in range(0, count):  # подсчитывает сумму игр
             txt = game[i]
             t = txt.find(" ")
-            txt = int(txt[0:t])
-            sum_game.append(txt)
+            number_games = int(txt[:t])
+            sum_game.append(number_games)
             if i == 0:  # показывает в зависимости от этапов финал, кол-во игр
                 my_win.label_101.setText(stage_list[0])
                 my_win.label_19.setText(game[0])
@@ -3548,8 +3555,11 @@ def page():
         my_win.tabWidget_2.setCurrentIndex(0)
         # выключить вкладки этапы если еще не было жеребьевки
         choice_etap = []
+        system_etap = []
         for k in sf:
             ch_flag = k.choice_flag
+            sys_etap = k.stage
+            system_etap.append(sys_etap)
             if ch_flag == 1:
                 choice_etap.append(k.stage)
         for m in choice_etap:
@@ -3564,6 +3574,12 @@ def page():
                 index = 2
         if len(choice_etap) > 0: # если была жеребьевка этапов, то включает вкладку
             my_win.tabWidget_stage.setCurrentIndex(index)
+        # определяет есть соревнования из одной таблице,то включает вкладку -финалы- иначе -группы-
+        if "Одна таблица" in system_etap:
+            a = 2 # включает вкл финалы
+        else:
+            a = 0 # включает вкл группы
+        my_win.tabWidget_stage.setCurrentIndex(a)
         tb_etap = my_win.tabWidget_stage.currentIndex()
 
         Button_view = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -4407,6 +4423,9 @@ def kol_player_in_group():
     my_win.label_19.setText(stroka_kol_game)
     my_win.label_19.show()
     my_win.Button_etap_made.setEnabled(True)
+    if int(kg) % 2 != 0: # Если число групп нечетное то вид страницы ставит -книжная-
+        my_win.comboBox_page_vid.setCurrentIndex(1)
+
     if sender == my_win.Button_etap_made:
         my_win.Button_etap_made.setEnabled(False)
         my_win.comboBox_page_vid.setEnabled(False)
@@ -7154,7 +7173,8 @@ def choice_gr_automat():
                 break
         all_player = 0      
         for number_posev in range(0, max_player): # полный посев
-        # ============== вариант ручной жеребьевки ========        
+        # ============== вариант ручной жеребьевки ======== 
+            family_region_list = []       
             txt_tmp.clear()
             id_family_region_list.clear()
             a = 0
@@ -7164,8 +7184,11 @@ def choice_gr_automat():
                 ps = posev_list[number_posev] # список игроков одного посева
                 txt_temp = ps[a] # один игрок в посеве
                 txt_id_str = f"{txt_temp[0]}" # ролучение id_фамилию и регион в строковой форме
+                znak = txt_id_str.find("/")
+                family_region_list.append(txt_id_str[znak + 1:])
                 id_family_region_list.append(txt_id_str)
-                text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
+                text_str = (',\n'.join(family_region_list)) # список игроков посева для формы выбора номера группы
+                # text_str = (',\n'.join(id_family_region_list)) # список игроков посева для формы выбора номера группы
                 a += 1
         # ===============================================
             if number_posev == 0: # 1-й посев сразу записывает в таблицу, а остальные группы заполняет пробелами
@@ -11145,6 +11168,7 @@ def load_name_net_after_choice_for_wiev(fin):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
+    sender = my_win.sender()
     stage_list_sf = ["1-й полуфинал", "2-й полуфинал"]
     from reportlab.platypus import Table
      # ==== новый вариант с использованием system id
@@ -11366,7 +11390,9 @@ def table_made(pv, stage):
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
-  
+    if sender == my_win.indent_edit_Action:
+        indent = change_indent_page()
+        doc.leftMargin = indent * cm
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
@@ -14676,9 +14702,9 @@ def change_page_vid():
         stage = i.stage
         sys.append(stage)
     stage, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
-                                        "смены ориентации страницы", sys)
-    id_system = system_id(stage)
-    if ok:                                   
+                                        "смены ориентации страницы", sys)  
+    if ok: 
+        id_system = system_id(stage)                                  
         sys = system.select().where(System.id == id_system).get()
         vid = sys.page_vid
         vid_ed = "книжная" if vid == "альбомная" else "альбомная"
@@ -14692,6 +14718,15 @@ def change_page_vid():
             return
     else:
         return
+
+
+def change_indent_page():
+    """меняет отступ в PDF странице"""
+    msgBox = QMessageBox
+    indent, ok = QInputDialog.getInt(my_win, "Таблицы", "Выберите отступ от края таблицы,\n"
+                                        "если она выходит за рамки страницы\n"
+                                        "0 - без отступа") 
+    return indent 
 
 
 def change_dir(catalog):
