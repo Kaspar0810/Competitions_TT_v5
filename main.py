@@ -10819,13 +10819,21 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
             shot_stage = "Ф"
             mark = st.find("-")
             sys_stage = f"{st[:mark]}{shot_stage}"
-
+        elif stage == "Одна таблица":
+            n_gr = gm
+            sys_stage = "Ф"
         round = res_id.round # раунд
         s1 = pl1.find("/")  
         s2 = pl2.find("/")   
         player1 = pl1[:s1]
+        dlina_pl1 = len(player1)
+        if dlina_pl1 >= 16:
+            player1 = short_player_begunki(fam=player1)
         city1 = pl1[s1 + 1:]
         player2 = pl2[:s2]
+        dlina_pl2 = len(player2)
+        if dlina_pl2 >= 16:
+            player2 = short_player_begunki(fam=player2)
         city2 = pl2[s2 + 1:]
         pl1 = f"{player1}\n{city1}" # делает фамилия и город на разнызх строчках
         pl2 = f"{player2}\n{city2}"
@@ -10855,6 +10863,14 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     return stiker
 
 
+def short_player_begunki(fam):
+    """Сокращает имя игрока до одной буквы, если длина фамилии и имя более 15 символов"""
+    mark = fam.find(" ")
+    family = fam[:mark]
+    name = fam[mark +1:mark + 2]
+    full_name = f"{family} {name}."
+    return full_name
+ 
 def begunki_made():
     """создание бегунков"""
     from sys import platform
@@ -11393,6 +11409,7 @@ def table_made(pv, stage):
     if sender == my_win.indent_edit_Action:
         indent = change_indent_page()
         doc.leftMargin = indent * cm
+    # doc.leftMargin = 0 * cm
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
