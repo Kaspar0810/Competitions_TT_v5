@@ -2666,8 +2666,10 @@ def fill_table_results():
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
+    idx = my_win.tableView.currentIndex() # номер выделенной строки
+    row_num = idx.row()
+    stage = my_win.tableView.model().index(row_num, 1).data()
     if tb == 3:
-        stage = "Предварительный"
         system_id = system.select().where(System.stage == stage).get()
         id_system = system_id.id
         player_list = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
@@ -5825,7 +5827,7 @@ def score_in_game():
     s11 = s21 = s12 = s22 = s13 = s23 = s14 = s24 = s15 = s25 = s16 = s26 = s17 = s27 = 0
     # поля ввода счета в партии
     if tab == 3:
-        sys = system.select().where(System.stage == "Предварительный").get()
+        sys = system.select().where(System.stage == stage).get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
         # ==========
         s11 = my_win.lineEdit_pl1_s1.text()
