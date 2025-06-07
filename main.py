@@ -3905,7 +3905,11 @@ def list_player_pdf(player_list):
         o = l.otchestvo    
         p = l.player
         if o is not None: # если есть отчество то добавляет к фамилии и имени
-            p = f"{p} {o}"
+            p_full = f"{p} {o}"
+            dlina = len(p_full)
+            if dlina > 27:
+                p_full = f"{p}\n{o}"
+            p = p_full
         b = l.bday
         b = format_date_for_view(str_date=b)
         r = l.rank
@@ -3925,8 +3929,8 @@ def list_player_pdf(player_list):
     t = Table(elements,
             #   colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
               colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
-            #   rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
-              rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+            #   rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
@@ -10870,7 +10874,8 @@ def short_player_begunki(fam):
     name = fam[mark +1:mark + 2]
     full_name = f"{family} {name}."
     return full_name
- 
+
+
 def begunki_made():
     """создание бегунков"""
     from sys import platform
