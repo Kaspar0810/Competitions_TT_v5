@@ -1776,7 +1776,7 @@ def db_insert_title(title_str):
         t = Title.select().order_by(Title.id.desc()).get()
         title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=ref,
                      kat_ref=kr, secretary=sek, kat_sec=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
-                     short_name_comp=short_name, multiregion=mr).save()
+                     short_name_comp=short_name, multiregion=mr, perenos=0).save()
     else:
         return
 
@@ -1943,6 +1943,17 @@ def title_string():
     title = Title.select().order_by(Title.id.desc()).get()
 
     nm = my_win.lineEdit_title_nazvanie.text()
+     # ======== если длинное название перенос на две строки
+    total_mark = len(nm)
+    if total_mark > 60:
+        nm_list = nm.split()
+        word, ok = QInputDialog.getItem(my_win, "Название", "Выберите после какого слова\n"
+                                        "перенести на другую строку", nm_list)
+        s1 = nm.find(word) + len(word)
+        strline1 = nm[:s1]
+        strline2 = nm[s1 + 1:]
+        nm = f"{strline1}\n{strline2}"
+    # ====== 
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
     ds = my_win.dateEdit_start.text()
@@ -2785,7 +2796,8 @@ def add_player():
         otc = "-"
         pl = pl_f
     else: # значит стоит отчество
-        otc = pl_f[mark_r +1:] 
+        otc = pl_f[mark_r +1:]
+        otc = otc.capitalize() 
         pl = pl_f[:mark_r]
     bd = my_win.lineEdit_bday.text()
     rn = my_win.lineEdit_R.text()
@@ -4130,8 +4142,6 @@ def list_player_pdf(player_list):
         elements.append(data)
     elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
-     # Создаем таблицу с фиксированными ширинами колонок
-    # table = Table(data, colWidths=[200, 100])
     t = Table(elements,
             colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
             rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
@@ -10819,17 +10829,7 @@ def func_zagolovok(canvas, doc):
     title = Title.get(Title.id == title_id())
 
     nz = title.name
-    # ======== если длинное название перенос на две строки
-    total_mark = len(nz)
-    if total_mark > 60 and pv == A4:
-        nz_list = nz.split()
-        word, ok = QInputDialog.getItem(my_win, "Название", "Выберите после какого слова\n"
-                                        "перенести на другую строку", nz_list)
-        s1 = nz.find(word) + len(word)
-        strline1 = nz[:s1]
-        strline2 = nz[s1 + 1:]
-        nz = f"{strline1}\n{strline2}"
-    # ====== 
+   
     ms = title.mesto
     sr = f"среди {title.sredi} {title.vozrast}"
     data_comp = data_title_string()
@@ -10844,15 +10844,15 @@ def func_zagolovok(canvas, doc):
     canvas.saveState()
     canvas.setFont("DejaVuSerif-Italic", 14)
     # центральный текст титула
-    if total_mark > 60 and pv == A4:
-        canvas.drawCentredString(width / 2.0, height - 1.1 * cm, strline1)
-        canvas.drawCentredString(width / 2.0, height - 1.5 * cm, strline2)
-        canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
-        canvas.setFont("DejaVuSerif-Italic", 11)
-    else:
-        canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
-        canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
-        canvas.setFont("DejaVuSerif-Italic", 11)
+    # if total_mark > 60 and pv == A4:
+    #     canvas.drawCentredString(width / 2.0, height - 1.1 * cm, strline1)
+    #     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, strline2)
+    #     canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
+    #     canvas.setFont("DejaVuSerif-Italic", 11)
+    # else:
+    canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
+    canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
+    canvas.setFont("DejaVuSerif-Italic", 11)
     # текста титула по основным
     # canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
     canvas.drawRightString(width - 1 * cm, height - 1.9 * cm, f"г. {ms}")  # город
@@ -16733,29 +16733,29 @@ def add_double_player_to_list():
     # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
     # f.addFromList(story, c)
 #     # c.save()
-def proba():
-    choices = Choice.select()
-    for ch in choices:
-        ch_id = ch.id
-        reg = ch.region       
-        region_mod = reg.rstrip()
-        Choice.update(region=region_mod).where(Choice.id == ch_id).execute()
-    regions = Region.select()
-    # count = len(regions)
-    for r in regions:
-        r_id = r.id
-        rg = r.region
-        reg_mod = rg.rstrip()      
-        Region.update(region=reg_mod).where(Region.id == r_id).execute()
-    #     reg = str(reg.rstrip())
-    # players = Player.select()
-    # for p in players:
-    #     reg = p.region
-    #     reg = str(reg.rstrip())
-    #     # bd_new = format_date_for_db(str_date=bd)
-    #     # txt = str(bd_new)
-    #     Player.update(region=reg).execute()
-    print("Все записи обновлены")
+# def proba():
+#     choices = Choice.select()
+#     for ch in choices:
+#         ch_id = ch.id
+#         reg = ch.region       
+#         region_mod = reg.rstrip()
+#         Choice.update(region=region_mod).where(Choice.id == ch_id).execute()
+#     regions = Region.select()
+#     # count = len(regions)
+#     for r in regions:
+#         r_id = r.id
+#         rg = r.region
+#         reg_mod = rg.rstrip()      
+#         Region.update(region=reg_mod).where(Region.id == r_id).execute()
+#     #     reg = str(reg.rstrip())
+#     # players = Player.select()
+#     # for p in players:
+#     #     reg = p.region
+#     #     reg = str(reg.rstrip())
+#     #     # bd_new = format_date_for_db(str_date=bd)
+#     #     # txt = str(bd_new)
+#     #     Player.update(region=reg).execute()
+#     print("Все записи обновлены")
 # =======        
 # def proba():
 #     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
@@ -16775,7 +16775,7 @@ def proba():
 #     # my_db = SqliteDatabase('comp_db.db')
 #     migrator = MySQLMigrator(db)
 #     # no_game = TextField(default="")
-#     otchestvo = CharField(null=True)  # новый столбец, его поле и значение по умолчанию
+#     perenos = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
     
 #     # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
 
@@ -16783,7 +16783,7 @@ def proba():
 #     #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
 #     #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #     #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-#     migrate(migrator.add_column('players', 'otchestvo', otchestvo)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#     migrate(migrator.add_column('titles', 'perenos', perenos)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
