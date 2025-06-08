@@ -4,6 +4,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.colors import *
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
@@ -2171,14 +2172,24 @@ def find_in_rlist():
 
 def input_player():
     """Ввод нового игрока если его нет в рейтинг листе текущем и январском"""
+    flaf_otc = 0
     msgBox = QMessageBox()
     text = my_win.lineEdit_Family_name.text()
     zn = text.find(" ")
     family = text[:zn]
-    name = text[zn + 1:]
-    family = family.capitalize()
-    name = name.capitalize()  # Переводит первую букву в заглавную
-    f_name = f"{family} {name}"
+    zn_1 = text.rfind(" ")
+    if zn == zn_1: # значит нет отчество 
+        flag_otc = 0       
+        name = text[zn + 1:]        
+    else:
+        flag_otc = 1
+        name = text[zn + 1:zn_1]
+        otc = text[zn_1 + 1:]
+        otc = otc.capitalize()  # Переводит первую букву в заглавную
+    # family = family.capitalize()
+    family = family.upper()
+    name = name.capitalize() # Переводит первую букву в заглавную    
+    f_name = f"{family} {name} {otc}" if flag_otc == 1 else f"{family} {name}"
     # повторная проверка игрока в январском рейтинге если два однофамильца и одинаковые имена 
     titles = Title.select().where(Title.id == title_id()).get()
     sex = titles.gamer
@@ -2206,7 +2217,7 @@ def input_player():
         full_stroka = ""
         my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
         family = family.upper()
-        my_win.lineEdit_Family_name.setText(f"{family} {name}")
+        my_win.lineEdit_Family_name.setText(f"{f_name}")
         my_win.lineEdit_bday.setFocus()
         my_win.lineEdit_bday.setInputMask('00.00.0000')
 
@@ -3891,7 +3902,116 @@ def date_formated_on_db_or_form(b_day):
     return b_day_formated
 
 
-def list_player_pdf(player_list):
+def proba_perenos_stroki():
+    """перенос строки в таблице"""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+
+    # Создаем документ
+    doc = SimpleDocTemplate("table_with_wrap.pdf", pagesize=A4)
+    elements = []
+
+    # Подготовка стилей
+    styles = getSampleStyleSheet()
+    custom_style = styles["Normal"].clone("CustomStyle")
+    custom_style.wordWrap = 'LTR' # Перенос слов (LTR - Left-To-Right)
+    custom_style.splitLongWords = True # Разделять длинные слова
+    custom_style.leading = 14 # Межстрочный интервал
+
+    # Данные таблицы с автоматическим переносом
+    data = [[Paragraph("Обычный текст с переносами по словам", custom_style)],]
+
+    # Создаем таблицу с фиксированными ширинами колонок
+    table = Table(data, colWidths=[200, 100])
+
+    # Стиль таблицы
+    table.setStyle(TableStyle([
+    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ('VALIGN', (0, 0), (-1, -1), 'TOP'), # Выравнивание по верхнему краю
+    ('PADDING', (0, 0), (-1, -1), 5), # Отступы в ячейках
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    ### Ключевые моменты:
+    # 1. **Использование Paragraph**:
+    # - Текст нужно оборачивать в `Paragraph`
+    # - Обычные строки (`str`) не поддерживают перенос
+
+    # 2. **Настройки стиля**:
+    # ```python
+    # custom_style = styles["Normal"].clone("CustomStyle")
+    # custom_style.wordWrap = 'LTR' # Перенос слов
+    # custom_style.splitLongWords = True # Разделять длинные слова
+    # custom_style.leading = 14 # Межстрочный интервал
+    # ```
+
+    # 3. **Обязательные параметры таблицы**:
+    # ```python
+    # Table(data, colWidths=[...]) # Фиксированная ширина колонок
+    # ```
+    # - Без указания `colWidths` перенос работать не будет
+
+    # 4. **Рекомендуемые стили таблицы**:
+    # ```python
+    # ('VALIGN', (0, 0), (-1, -1), 'TOP') # Выравнивание по верху
+    # ('PADDING', (0, 0), (-1, -1), 5) # Отступы для читаемости
+    # ```
+
+    ### Для многострочных заголовков
+    # ```python
+    # header_style = styles["Heading4"].clone("HeaderStyle")
+    # header_style.wordWrap = 'LTR'
+    # header_style.splitLongWords = True
+
+    # data = [
+    # [
+    # Paragraph("Колонка с очень длинным заголовком", header_style),
+    # Paragraph("Обычный заголовок", header_style)
+    # ],
+    # # ... остальные строки
+    # ]
+    # ```
+
+    ### +++++++++++++++++++++++++++++++++++++ Решение проблем
+    # 1. **Если текст не переносится**:
+    # - Убедитесь, что указаны `colWidths`
+    # - Проверьте, что используете `Paragraph`, а не обычную строку
+    # - Добавьте `splitLongWords=True`
+
+    # 2. **Если переносы выглядят некрасиво**:
+    # ```python
+    # custom_style.alignment = 4 # Выравнивание по ширине (0-лево, 1-центр, 2-право, 4-по ширине)
+    # custom_style.hyphenation = True # Включить расстановку переносов
+    # ```
+
+    # 3. **Для динамической высоты строк**:
+    # ```python
+    # # ReportLab автоматически рассчитает высоту
+    # # Для ручной настройки:
+    # table = Table(data, colWidths=[200, 100], rowHeights=None)
+    # ```
+
+    # ### Альтернативный вариант (KeepInFrame)
+    # Для сложных случаев можно использовать контейнер `KeepInFrame`:
+    # ```python
+    # from reportlab.platypus import KeepInFrame
+
+    # data = [
+    # [
+    # KeepInFrame(
+    # maxWidth=200,
+    # maxHeight=100,
+    # content=[Paragraph("Очень длинный текст...", custom_style)]
+    # ),
+    # "Простой текст"
+    # ]
+    # ]
+# ==============================================================
+def _list_player_pdf(player_list):
     """создание списка участников в pdf файл"""
     from reportlab.platypus import Table
     story = []  # Список данных таблицы участников
@@ -3912,6 +4032,7 @@ def list_player_pdf(player_list):
             if dlina > 27:
                 p_full = f"{p}\n{o}"
             p = p_full
+        p = f'{p} {o}'
         b = l.bday
         b = format_date_for_view(str_date=b)
         r = l.rank
@@ -3924,14 +4045,12 @@ def list_player_pdf(player_list):
         
         t = chop_line(t) # разбивает строку тренеров не две если строкка длинная
         data = [n, p, b, r, c, g, z, t, m]
-
         elements.append(data)
     elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-            #   colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
-              colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
-              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+            colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
+            rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
             #   rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
@@ -3944,6 +4063,90 @@ def list_player_pdf(player_list):
                            ('TOPPADDING', (0, 0), (-1, -1), 1),
                            # вериткальное выравнивание в ячейке заголовка
                            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey, None, (1, 1)),
+                        #    ('LINEBELOW', (0, 0), (-1, -1), 0.02, colors.grey, None, (1, 1)),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+
+    doc = SimpleDocTemplate(f"{short_name}_player_list.pdf", pagesize=A4)
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    os.chdir("..")
+
+
+def list_player_pdf(player_list):
+    """создание списка участников в pdf файл"""
+    from reportlab.platypus import Table
+     # Подготовка стилей
+    styles = getSampleStyleSheet()
+    custom_style = styles['Normal'].fontName = 'DejaVuSerif'
+    custom_style = styles['Normal'].fontSize = 6
+    custom_style = styles["Normal"].clone("CustomStyle")
+    custom_style.wordWrap = 'LTR' # Перенос слов (LTR - Left-To-Right)
+    # custom_style.splitLongWords = True # Разделять длинные слова
+    custom_style.leading = 6 # Межстрочный интервал
+    story = []  # Список данных таблицы участников
+    elements = []  # Список Заголовки столбцов таблицы
+    tit = Title.get(Title.id == title_id())
+    short_name = tit.short_name_comp
+    gamer = tit.gamer
+    count = len(player_list)  # количество записей в базе
+    kp = count + 1
+    n = 0
+    for l in player_list:
+        n += 1
+        o = l.otchestvo    
+        p = l.player
+        p = f'{p}' if o is None else f'{p} {o}'
+        b = l.bday
+        b = format_date_for_view(str_date=b)
+        r = l.rank
+        c = l.city
+        g = l.region
+        z = l.razryad
+        coach_id = l.coach_id
+        t = coach_id.coach
+        m = l.mesto
+        
+        # t = chop_line(t) # разбивает строку тренеров не две если строкка длинная
+        # ========================
+        data = [n, [Paragraph(p, custom_style)], b, r, c, g, z, [Paragraph(t, custom_style)], m]
+        # =========================
+
+        elements.append(data)
+    elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
+                        "Место"])
+     # Создаем таблицу с фиксированными ширинами колонок
+    # table = Table(data, colWidths=[200, 100])
+    t = Table(elements,
+            colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
+            rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+            #   rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                        #    ('FONTSIZE', (0, 0), (-1, -1), 7),
+                            ('FONTSIZE', (0, 0), (-1, -1), 6),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                            # горизонтальное выравнивание в ячейке
                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
                            ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
@@ -16754,7 +16957,7 @@ my_win.Button_Ok.clicked.connect(enter_score) # кнопка ввода счет
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
