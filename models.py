@@ -98,6 +98,7 @@ class Title(BaseModel):
     short_name_comp = CharField()
     tab_enabled = CharField()
     multiregion = IntegerField()
+    perenos = IntegerField()
 
     class Meta:
         db_table = "titles"
