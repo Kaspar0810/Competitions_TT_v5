@@ -1761,12 +1761,18 @@ def db_insert_title(title_str):
         mr = 1
     else:
         mr = 0                                        
+    reply = msgBox.question(my_win, "Уведомление", "Будет ли в списках участников\n присутствовать отчество? \n"
+                                            "Если да нажмите -YES-\n нажмите -NO-", msgBox.Yes, msgBox.No)
+    if msgBox.Yes:
+        otc = 1
+    else:
+        otc = 0  
 
     short_name, ok = QInputDialog.getText(my_win, "Краткое имя соревнования", "Создайте краткое имя соревнования,\nдля"
                                           " отбражения в названии файла при "
                                           "сохранении,\nиспользуете латинские буквы"
                                           " без пробелов.\n"
-                                          "В формате название, возраст участников_дата,"
+                                          "В формате: название, возраст участников_дата,"
                                           " месяц, год и кто "
                                           "играет.")
     if ok:
@@ -1777,7 +1783,7 @@ def db_insert_title(title_str):
         t = Title.select().order_by(Title.id.desc()).get()
         title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=ref,
                      kat_ref=kr, secretary=sek, kat_sec=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
-                     short_name_comp=short_name, multiregion=mr, perenos=ind).save()
+                     short_name_comp=short_name, multiregion=mr, perenos=ind, otchestvo=otc).save()
     else:
         return
 
@@ -1950,11 +1956,7 @@ def title_string():
         nm_list = nm.split()
         word, ok = QInputDialog.getItem(my_win, "Название", "Выберите после какого слова\n"
                                         "перенести на другую строку", nm_list)
-        ind = nm_list.index(word) + 1
-        # s1 = nm.find(word) + len(word)
-        # strline1 = nm[:s1]
-        # strline2 = nm[s1 + 1:]
-        # nm = f"{strline1}\n{strline2}"
+        ind = nm_list.index(word)
     # ====== 
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -10848,7 +10850,7 @@ def func_zagolovok(canvas, doc):
     # центральный текст титула
     if ind > 0 and pv == A4:
         nz_list = nz.split()
-        word = nz_list[ind + 1]
+        word = nz_list[ind]
         s1 = nz.find(word) + len(word)
         strline1 = nz[:s1]
         strline2 = nz[s1 + 1:]
