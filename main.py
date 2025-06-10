@@ -2960,6 +2960,42 @@ def add_player():
     my_win.lineEdit_Family_name.setFocus()
 
 
+def find_otchestvo():
+    """ищет отчество в базе данных"""
+    sex_list = ["девочки", "девушки", "юниорки", "женщины"]
+    titles = Title.select().where(Title.id == title_id()).get()
+    pol = titles.gamer
+    sex = "w" if pol in sex_list else "m"
+    otchestvo = Player_patronymic.select().where(Player_patronymic.sex == sex)
+    count_otchestvo = len(otchestvo)
+    # if count_otchestvo == 0:
+    #     with db:
+    #         otc = Player_patronymic(coach=ch, player_id=num).save()
+    #     return
+    txt = my_win.lineEdit_otchestvo .text()
+    if txt == "":
+        my_win.textEdit.clear()
+    txt = txt.capitalize()
+    otchestvo_list = Player_patronymic.select().where(Player_patronymic.patronymic ** f'{txt}%')  # like
+    if len(otchestvo_list) > 0:
+        fill_table(player_list)
+    else:
+        otc = Player_patronymic(coach=ch).save()
+
+
+    # coach = Coach.select()
+    # count_coach = len(coach)
+    # if count_coach == 0:  # если первая запись то добавляет без проверки
+    #     with db:
+    #         cch = Coach(coach=ch, player_id=num).save()
+    #     return
+    for c in coach:
+        coa = Coach.select().where(Coach.coach == ch)
+        if bool(coa):
+            return
+        else:
+            otc = Player_patronymic(coach=ch).save()
+
 def format_date_for_db(str_date):
     """первод даты к формату базы данных год-месяц-день"""
     txt =str(str_date)
@@ -3110,6 +3146,7 @@ def dclick_in_listwidget():
             rg = Region.get(Region.id == cr.region_id)
             my_win.comboBox_region.setCurrentText(rg.region)
             my_win.listWidget.clear()
+        my_win.lineEdit_otchestvo.setFocus()
           # ======= проверка на рейтинг ====
     else:  # идет заполнение поля "тренер" из listWidget
         my_win.lineEdit_coach.setText(text)
@@ -3349,6 +3386,14 @@ def page():
         load_coach_to_combo()
         load_comboBox_filter()
         region()
+        titles = Title.select().where(Title.id == title_id()).get()
+        otc = titles.otchestvo
+        if otc == 1:
+            my_win.lineEdit_otchestvo.setVisible(True)
+            my_win.label_28.setVisible(True)
+        else:
+            my_win.lineEdit_otchestvo.setVisible(False)
+            my_win.label_28.setVisible(False)
         my_win.Button_app.setEnabled(False)
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_clear_del.setEnabled(False)
@@ -3722,6 +3767,9 @@ def page():
         # ======
     hide_show_columns(tb)
 
+def otchestvo_input():
+    """елси требуется отчество то вклюяает поле и выводит в listView сохраненые данные"""
+    pass
 
 def label_playing_count():
     """На вкладке -система- пишет сколько игр сыграно в каждом этапе"""
@@ -16830,12 +16878,13 @@ my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.lineEdit_pl1_double.textChanged.connect(tab_double)
 my_win.lineEdit_pl2_double.textChanged.connect(tab_double)
+my_win.lineEdit_otchestvo.textChanged.connect(find_otchestvo)
 
 my_win.comboBox_region.currentTextChanged.connect(find_city)
 # comboBox_family_city = QComboBox()
 # comboBox_family_city.currentTextChanged.connect(referee)
 # ============= двойной клик
-# двойной клик по listWidget (рейтинг, тренеры)
+# двойной клик по listWidget (рейтинг, тренеры, отчество)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 my_win.listWidget_double.itemDoubleClicked.connect(dclick_in_listWidget_double)
 

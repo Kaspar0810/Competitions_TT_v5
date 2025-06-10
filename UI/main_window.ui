@@ -825,9 +825,9 @@
      <widget class="QLineEdit" name="lineEdit_Family_name">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>10</x>
         <y>30</y>
-        <width>241</width>
+        <width>190</width>
         <height>21</height>
        </rect>
       </property>
@@ -835,9 +835,9 @@
      <widget class="QLineEdit" name="lineEdit_bday">
       <property name="geometry">
        <rect>
-        <x>292</x>
+        <x>326</x>
         <y>30</y>
-        <width>121</width>
+        <width>108</width>
         <height>21</height>
        </rect>
       </property>
@@ -845,9 +845,9 @@
      <widget class="QLineEdit" name="lineEdit_R">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>440</x>
         <y>30</y>
-        <width>61</width>
+        <width>41</width>
         <height>21</height>
        </rect>
       </property>
@@ -857,7 +857,7 @@
        <rect>
         <x>10</x>
         <y>70</y>
-        <width>161</width>
+        <width>160</width>
         <height>21</height>
        </rect>
       </property>
@@ -894,7 +894,7 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>325</x>
         <y>10</y>
         <width>111</width>
         <height>20</height>
@@ -913,9 +913,9 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>454</x>
         <y>10</y>
-        <width>61</width>
+        <width>21</width>
         <height>16</height>
        </rect>
       </property>
@@ -926,7 +926,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Рейтинг</string>
+       <string>R</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_4">
@@ -951,7 +951,7 @@
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>259</x>
+        <x>278</x>
         <y>51</y>
         <width>91</width>
         <height>16</height>
@@ -970,7 +970,7 @@
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>422</x>
+        <x>420</x>
         <y>50</y>
         <width>51</width>
         <height>16</height>
@@ -1008,10 +1008,10 @@
      <widget class="QComboBox" name="comboBox_razryad">
       <property name="geometry">
        <rect>
-        <x>413</x>
+        <x>411</x>
         <y>70</y>
-        <width>71</width>
-        <height>26</height>
+        <width>67</width>
+        <height>22</height>
        </rect>
       </property>
      </widget>
@@ -1020,8 +1020,8 @@
        <rect>
         <x>180</x>
         <y>70</y>
-        <width>231</width>
-        <height>26</height>
+        <width>220</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="sizeAdjustPolicy">
@@ -1105,29 +1105,39 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>5</y>
         <width>25</width>
         <height>21</height>
        </rect>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_otchestvo">
+     <widget class="QLineEdit" name="lineEdit_otchestvo">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>9</y>
-        <width>111</width>
+        <x>206</x>
+        <y>30</y>
+        <width>113</width>
         <height>20</height>
        </rect>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::RightToLeft</enum>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>222</x>
+        <y>10</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <italic>true</italic>
+       </font>
       </property>
       <property name="text">
        <string>Отчество</string>
-      </property>
-      <property name="tristate">
-       <bool>false</bool>
       </property>
      </widget>
     </widget>

@@ -231,3 +231,12 @@ class Referee(BaseModel):
         db_table = "referees"
         order_by = "family"
 
+class Player_patronymic(BaseModel):
+    patronumic = CharField(45)
+    sex = CharField(45)
+
+    class Meta:
+        db_table = "player_patronumics"
+        order_by = "player_patronumic" 
+
+
