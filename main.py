@@ -781,7 +781,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         double_family()
     
 
-
     def exit(self):
         flag = 0
         exit_comp(flag)
@@ -1392,7 +1391,7 @@ def dbase():
 
     with db:
         db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
-                          Result, Game_list, Choice, Delete_player, Referee])
+                          Result, Game_list, Choice, Delete_player, Referee, Patronymic])
 
 
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
@@ -2966,21 +2965,45 @@ def find_otchestvo():
     titles = Title.select().where(Title.id == title_id()).get()
     pol = titles.gamer
     sex = "w" if pol in sex_list else "m"
-    otchestvo = Player_patronymic.select().where(Player_patronymic.sex == sex)
-    count_otchestvo = len(otchestvo)
+    list_otchestvo = []
+    otc = my_win.lineEdit_otchestvo.text()
+    otc = otc.capitalize()  # Переводит первую букву в заглавную
+    # if my_win.checkBox_find_player.isChecked():
+        # player = Player.select().where(Player.title_id == title_id())
+    # otchestvo_list = Patronymic.select().where(Patronymic.patronymic ** f'{otc}%')  
+    otchestvo_list = Patronymic.select()
+    count = len(otchestvo_list) # создает выборку из базы отчеств фамилии,что начинаются на CP
+    # for pl in otchestvo_list: #походит циклом и создает список с их ID
+    #     ot_id = pl.id
+    #     list_otchestvo.append(ot_id)
+
+    #     player_list = Patronymic.select().where(Patronymic.patronymic_id << list_otchestvo) # окончательная выборка со всеми тренерами (id)
+    # else:
+        # pat = Patronymic.select()
+    pat = otchestvo_list.where((Patronymic.patronymic ** f'{otc}%') & (Patronymic.sex == sex))  # like
+    # tochka = otc.find(".")
+    # if tochka == -1:
+    if (len(pat)) != 0:
+        for chp in pat:
+            full_stroka = chp.patronymic
+            my_win.listWidget.addItem(full_stroka)
+
+
+
+    # otchestvo = Patronymic.select().where(Patronymic.sex == sex)
     # if count_otchestvo == 0:
-    #     with db:
-    #         otc = Player_patronymic(coach=ch, player_id=num).save()
-    #     return
-    txt = my_win.lineEdit_otchestvo .text()
-    if txt == "":
-        my_win.textEdit.clear()
-    txt = txt.capitalize()
-    otchestvo_list = Player_patronymic.select().where(Player_patronymic.patronymic ** f'{txt}%')  # like
-    if len(otchestvo_list) > 0:
-        fill_table(player_list)
-    else:
-        otc = Player_patronymic(coach=ch).save()
+    #     # with db:
+    #     #     otc = Patronymic(coach=ch, player_id=num).save()
+    # #     return
+    # txt = my_win.lineEdit_otchestvo .text()
+    # if txt == "":
+    #     my_win.textEdit.clear()
+    # txt = txt.capitalize()
+    # otchestvo_list = Patronymic.select().where(Patronymic.patronymic ** f'{txt}%')  # like
+    # # if len(otchestvo_list) > 0:
+    #     fill_table(player_list)
+    # else:
+    #     otc = Player_patronymic(coach=ch).save()
 
 
     # coach = Coach.select()
@@ -2989,12 +3012,12 @@ def find_otchestvo():
     #     with db:
     #         cch = Coach(coach=ch, player_id=num).save()
     #     return
-    for c in coach:
-        coa = Coach.select().where(Coach.coach == ch)
-        if bool(coa):
-            return
-        else:
-            otc = Player_patronymic(coach=ch).save()
+    # for c in coach:
+    #     coa = Coach.select().where(Coach.coach == ch)
+    #     if bool(coa):
+    #         return
+    #     else:
+    #         otc = Patronymic(coach=ch).save()
 
 def format_date_for_db(str_date):
     """первод даты к формату базы данных год-месяц-день"""
@@ -4173,9 +4196,9 @@ def list_player_pdf(player_list):
     n = 0
     for l in player_list:
         n += 1
-        o = l.otchestvo    
+        # o = l.otchestvo    
         p = l.player
-        p = f'{p}' if o is None else f'{p} {o}'
+        # p = f'{p}' if o is None else f'{p} {o}'
         b = l.bday
         b = format_date_for_view(str_date=b)
         r = l.rank
@@ -16817,6 +16840,18 @@ def add_double_player_to_list():
 # =======        
 def proba():
     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
+    # создать таблицу
+    
+    # class Patronymic(BaseModel):
+    #     patronymic = CharField(45)
+    #     sex = CharField(45)
+
+    #     class Meta:
+    #         db_table = "patronymic"
+    #         order_by = "patronymic"
+    #     # db.connect()
+    #     db.create_tables([Patronymic], safe=True)
+    #     db.close()
  
 # #creating the cursor object 
 #     cur = myconn.cursor() 
@@ -16828,20 +16863,18 @@ def proba():
     
 #     myconn.close() 
 
-    # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
-#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-    # my_db = SqliteDatabase('comp_db.db')
-    migrator = MySQLMigrator(db)
-    # no_game = TextField(default="")
-    perenos = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
-    
-    # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
 
-    # with db:
-    #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
-    #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-    #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-    migrate(migrator.add_column('titles', 'perenos', perenos)) # Добавление столбца (таблица, столбец, повтор название столбца)
+    # migrator = MySQLMigrator(db)
+    # # no_game = TextField(default="")
+    # patronymic_id = ForeignKeyField(Player, field=Patronymic.id, null=True)  # новый столбец, его поле и значение по умолчанию
+    
+    # # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
+
+    # # with db:
+    # #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
+    # #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+    # #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
+    # migrate(migrator.add_column('players', 'patronymic_id', patronymic_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
@@ -17016,7 +17049,7 @@ my_win.Button_Ok.clicked.connect(enter_score) # кнопка ввода счет
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)

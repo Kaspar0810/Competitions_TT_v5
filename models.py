@@ -1,7 +1,6 @@
 from peewee import *
 
 
-# db = SqliteDatabase("comp_db.db")
 db = MySQLDatabase("mysql_db", user="root", password="db_pass", host="localhost", port=3306)
 
 class BaseModel(Model):
@@ -104,6 +103,14 @@ class Title(BaseModel):
     class Meta:
         db_table = "titles"
 
+class Patronymic(BaseModel):
+    patronymic = CharField(45)
+    sex = CharField(45)
+
+    class Meta:
+        db_table = "patronymic"
+        order_by = "patronymic" 
+
 class Player(BaseModel):
     player = CharField(50)    
     bday = DateField()
@@ -121,7 +128,7 @@ class Player(BaseModel):
     total_game_player = IntegerField()
     total_win_game = IntegerField()
     application = CharField(30)
-    otchestvo = CharField()
+    patronymic_id = ForeignKeyField(Patronymic)
    
     class Meta:
         db_table = "players"
@@ -231,12 +238,6 @@ class Referee(BaseModel):
         db_table = "referees"
         order_by = "family"
 
-class Player_patronymic(BaseModel):
-    patronumic = CharField(45)
-    sex = CharField(45)
 
-    class Meta:
-        db_table = "player_patronumics"
-        order_by = "player_patronumic" 
 
 
