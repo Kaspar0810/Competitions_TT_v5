@@ -1071,7 +1071,7 @@
       <property name="font">
        <font>
         <family>Georgia</family>
-        <pointsize>14</pointsize>
+        <pointsize>12</pointsize>
         <italic>true</italic>
        </font>
       </property>
@@ -4624,8 +4624,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5250,8 +5250,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5762,8 +5762,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6491,8 +6491,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6558,8 +6558,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6929,8 +6929,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>434</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">

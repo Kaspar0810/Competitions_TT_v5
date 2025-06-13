@@ -2792,16 +2792,9 @@ def add_player():
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     pl_id = my_win.lineEdit_id.text()
-    pl_f = my_win.lineEdit_Family_name.text()
-    mark_r = pl_f.rfind(' ') # находит пробел отделяющий отчество
-    mark_l = pl_f.find(' ')    
-    if mark_l == mark_r:
-        otc = "-"
-        pl = pl_f
-    else: # значит стоит отчество
-        otc = pl_f[mark_r +1:]
-        otc = otc.capitalize() 
-        pl = pl_f[:mark_r]
+    pl = my_win.lineEdit_Family_name.text()
+
+    otc = my_win.lineEdit_otchestvo.text()
     bd = my_win.lineEdit_bday.text()
     rn = my_win.lineEdit_R.text()
     ct = my_win.lineEdit_city_list.text()
@@ -2835,11 +2828,15 @@ def add_player():
             my_win.lineEdit_R.clear()
             my_win.lineEdit_city_list.clear()
             my_win.lineEdit_coach.clear()
+            my_win.lineEdit_otchestvo.clear()
             return
     add_coach(ch, num)
+    add_patronymic()
+    add_city()
     txt_edit = my_win.textEdit.toPlainText()
     ms = "" # записвыает место в базу как пустое
-    idc = Coach.get(Coach.coach == ch)
+    idc = Coach.get(Coach.coach == ch) # получает id тренера
+    idp = Patronymic.get(Patronymic.patronymic == otc)
     # ==== определяет завявка предварительная или нет
     title = Title.select().where(Title.id == title_id()).get()
     data_start = title.data_start
@@ -2859,7 +2856,7 @@ def add_player():
             bd_mod = f"{year}-{monh}-{days}"
             plr = Player(player=pl, bday=bd_mod, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
-                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0, otchestvo=otc).save()
+                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0, patronymic_id=idp).save()
                          
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
@@ -2888,7 +2885,7 @@ def add_player():
             with db:
                 players = Player(player=pl, bday=bd_new, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
-                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka, otchestvo=otc).save()
+                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka, patronymic_id=idp).save()
             player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
             count_pred = len(player_predzayavka)
             my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
@@ -2952,6 +2949,7 @@ def add_player():
     my_win.lineEdit_R.clear()
     my_win.lineEdit_city_list.clear()
     my_win.lineEdit_coach.clear()
+    my_win.lineEdit_otchestvo.clear()
     if txt == "Редактировать":
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_del_player.setEnabled(False) 
@@ -2961,63 +2959,25 @@ def add_player():
 
 def find_otchestvo():
     """ищет отчество в базе данных"""
-    sex_list = ["девочки", "девушки", "юниорки", "женщины"]
-    titles = Title.select().where(Title.id == title_id()).get()
-    pol = titles.gamer
-    sex = "w" if pol in sex_list else "m"
-    list_otchestvo = []
-    otc = my_win.lineEdit_otchestvo.text()
-    otc = otc.capitalize()  # Переводит первую букву в заглавную
-    # if my_win.checkBox_find_player.isChecked():
-        # player = Player.select().where(Player.title_id == title_id())
-    # otchestvo_list = Patronymic.select().where(Patronymic.patronymic ** f'{otc}%')  
-    otchestvo_list = Patronymic.select()
-    count = len(otchestvo_list) # создает выборку из базы отчеств фамилии,что начинаются на CP
-    # for pl in otchestvo_list: #походит циклом и создает список с их ID
-    #     ot_id = pl.id
-    #     list_otchestvo.append(ot_id)
-
-    #     player_list = Patronymic.select().where(Patronymic.patronymic_id << list_otchestvo) # окончательная выборка со всеми тренерами (id)
-    # else:
-        # pat = Patronymic.select()
-    pat = otchestvo_list.where((Patronymic.patronymic ** f'{otc}%') & (Patronymic.sex == sex))  # like
-    # tochka = otc.find(".")
-    # if tochka == -1:
-    if (len(pat)) != 0:
-        for chp in pat:
-            full_stroka = chp.patronymic
-            my_win.listWidget.addItem(full_stroka)
-
-
-
-    # otchestvo = Patronymic.select().where(Patronymic.sex == sex)
-    # if count_otchestvo == 0:
-    #     # with db:
-    #     #     otc = Patronymic(coach=ch, player_id=num).save()
-    # #     return
-    # txt = my_win.lineEdit_otchestvo .text()
-    # if txt == "":
-    #     my_win.textEdit.clear()
-    # txt = txt.capitalize()
-    # otchestvo_list = Patronymic.select().where(Patronymic.patronymic ** f'{txt}%')  # like
-    # # if len(otchestvo_list) > 0:
-    #     fill_table(player_list)
-    # else:
-    #     otc = Player_patronymic(coach=ch).save()
-
-
-    # coach = Coach.select()
-    # count_coach = len(coach)
-    # if count_coach == 0:  # если первая запись то добавляет без проверки
-    #     with db:
-    #         cch = Coach(coach=ch, player_id=num).save()
-    #     return
-    # for c in coach:
-    #     coa = Coach.select().where(Coach.coach == ch)
-    #     if bool(coa):
-    #         return
-    #     else:
-    #         otc = Patronymic(coach=ch).save()
+    txt = my_win.label_63.text()
+    my_win.listWidget.clear()
+    if txt == "":
+        return
+    else:
+        sex_list = ["Девочки", "Девушки", "Юниорки", "Женщины"]
+        my_win.label_63.setText("Отчество")
+        titles = Title.select().where(Title.id == title_id()).get()
+        pol = titles.gamer
+        sex = "w" if pol in sex_list else "m"
+        otc = my_win.lineEdit_otchestvo.text()
+        otc = otc.capitalize()  # Переводит первую букву в заглавную
+        otchestvo_list = Patronymic.select()
+        pat = otchestvo_list.where((Patronymic.patronymic ** f'{otc}%') & (Patronymic.sex == sex))  # like
+        if (len(pat)) != 0:
+            for chp in pat:
+                full_stroka = chp.patronymic
+                my_win.listWidget.addItem(full_stroka)
+ 
 
 def format_date_for_db(str_date):
     """первод даты к формату базы данных год-месяц-день"""
@@ -3130,7 +3090,11 @@ def dclick_in_listwidget():
         cr = City.get(City.city == text)
         rg = Region.get(Region.id == cr.region_id)
         my_win.comboBox_region.setCurrentText(rg.region)
-        my_win.listWidget.clear()   
+        my_win.listWidget.clear() 
+    elif txt_tmp == "Отчество":
+        my_win.label_63.setText("") 
+        my_win.lineEdit_otchestvo.setText(text)
+        my_win.listWidget.clear()
     elif coach_field == "": # если строка "тренер" пустая значит заполняются поля игрока
         ds = len(text)
         sz = text.index(",")
@@ -3858,13 +3822,19 @@ def add_city():
     """добавляет в таблицу город и соответсвующий ему регион"""
     city_field = my_win.lineEdit_city_list.text()
     city_field = city_field.capitalize()  # Переводит первую букву в заглавную
+    cities = City.select().where(City.city == city_field)
+    if len(cities) == 0:
+        regions = my_win.comboBox_region.currentText()
+        reg = Region.select().where(Region.region == regions).get()
+        reg_id = reg.id
+        City(city=city_field, region_id=reg_id).save()
     index = city_field.find(".")
     if index != -1:
         second_word = city_field[index + 1:]
         second_word = second_word.capitalize()
         city_field = city_field[:index + 1] + second_word
     my_win.lineEdit_city_list.setText(city_field)
-    my_win.textEdit.setText("Выберите регион в котором находится населенный пункт.")
+    # my_win.textEdit.setText("Выберите регион в котором находится населенный пункт.")
 
 
 def find_coach():
@@ -3908,6 +3878,31 @@ def add_coach(ch, num):
         else:
             cch = Coach(coach=ch, player_id=num).save()
 
+
+def add_patronymic():
+    """Провкрка отчества если нет, то добавляет в DB"""
+    pol_list = ['Мальчики','Юноши', 'Юниоры', 'Мужчины']
+    titles = Title.select().where(Title.id == title_id()).get()
+    otc = my_win.lineEdit_otchestvo.text()
+    otc = otc.capitalize()
+    pol = titles.gamer
+    sex = "m" if pol in pol_list else "w"
+    patronymic = Patronymic.select()
+    count = len(patronymic)
+    if count == 0:# если 1-я запись
+        with db:
+            otch = Patronymic(patronymic=otc, sex=sex).save()
+    else:
+        patron = Patronymic.select().where(Patronymic.patronymic == otc)
+        for pat in patronymic:
+            patr = pat.patronymic
+            if patr == otc:
+                return            
+        otch = Patronymic(patronymic=otc, sex=sex).save()
+        otchestvo = Patronymic.select().where(Patronymic.patronymic == otc).get()
+        idp = otchestvo.id
+        return idp
+ 
 
 def find_player():
     """Установка курсора в строку поиска спортсмена в загруженном списке"""
@@ -4184,21 +4179,26 @@ def list_player_pdf(player_list):
     custom_style = styles['Normal'].fontSize = 6
     custom_style = styles["Normal"].clone("CustomStyle")
     custom_style.wordWrap = 'LTR' # Перенос слов (LTR - Left-To-Right)
-    # custom_style.splitLongWords = True # Разделять длинные слова
     custom_style.leading = 6 # Межстрочный интервал
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
     tit = Title.get(Title.id == title_id())
     short_name = tit.short_name_comp
     gamer = tit.gamer
+    otc = tit.otchestvo
     count = len(player_list)  # количество записей в базе
     kp = count + 1
     n = 0
     for l in player_list:
         n += 1
-        # o = l.otchestvo    
-        p = l.player
-        # p = f'{p}' if o is None else f'{p} {o}'
+        if otc == 1:
+            pat_id  = l.patronymic_id 
+            patronymics = Patronymic.select().where(Patronymic.id == pat_id).get()  
+            o = patronymics.patronymic
+            p = l.player
+            p = f"{p} {o}"
+        else:
+            p = l.player
         b = l.bday
         b = format_date_for_view(str_date=b)
         r = l.rank
@@ -4208,14 +4208,12 @@ def list_player_pdf(player_list):
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
-        
-        # t = chop_line(t) # разбивает строку тренеров не две если строкка длинная
         # ========================
         data = [n, [Paragraph(p, custom_style)], b, r, c, g, z, [Paragraph(t, custom_style)], m]
         # =========================
 
         elements.append(data)
-    elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Регион", "Разряд", "Тренер(ы)",
+    elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Субъект РФ", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
             colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
@@ -16838,8 +16836,8 @@ def add_double_player_to_list():
 #     #     Player.update(region=reg).execute()
 #     print("Все записи обновлены")
 # =======        
-def proba():
-    myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
+# def proba():
+    # myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
     # создать таблицу
     
     # class Patronymic(BaseModel):
@@ -16912,7 +16910,7 @@ my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.lineEdit_pl1_double.textChanged.connect(tab_double)
 my_win.lineEdit_pl2_double.textChanged.connect(tab_double)
 my_win.lineEdit_otchestvo.textChanged.connect(find_otchestvo)
-
+my_win.lineEdit_otchestvo.returnPressed.connect(add_patronymic)
 my_win.comboBox_region.currentTextChanged.connect(find_city)
 # comboBox_family_city = QComboBox()
 # comboBox_family_city.currentTextChanged.connect(referee)
@@ -16966,9 +16964,6 @@ my_win.comboBox_edit_etap2.currentTextChanged.connect(select_stage_for_edit)
 my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 
-# my_win.comboBox_filter_group.currentTextChanged.connect(filter_gr)
-# my_win.comboBox_filter_played.currentTextChanged.connect(filter_gr)
-# my_win.comboBox_find_name.currentTextChanged.connect(filter_gr)
 my_win.comboBox_filter_final.currentTextChanged.connect(filter_fin)
 my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tableView)
 # my_win.comboBox_filter_region_in_R.currentTextChanged.connect(filter_rejting_list)
@@ -16982,24 +16977,11 @@ my_win.comboBox_kategor_sec.currentTextChanged.connect(add_referee_to_db)
 
 
 # =======  отслеживание переключение чекбоксов =========
-# my_win.radioButton_group.toggled.connect(load_combobox_filter_group)
-# my_win.radioButton_PF.toggled.connect(load_combobox_filter_group_semifinal)
-# my_win.radioButton_Fin.toggled.connect(load_combobox_filter_group)
-
 my_win.radioButton_match_3.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_5.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_7.toggled.connect(change_status_visible_and_score_game)
 
-# my_win.radioButton_final.toggled.connect(change_tab_filter)
-# my_win.radioButton_semifinal.toggled.connect(change_tab_filter)
-# my_win.radioButton_group.toggled.connect(change_tab_filter)
-
-# my_win.radioButton_match_4.toggled.connect(change_status_visible_and_score_game)
-# my_win.radioButton_match_6.toggled.connect(change_status_visible_and_score_game)
-# my_win.radioButton_match_8.toggled.connect(change_status_visible_and_score_game)
-
 my_win.checkBox_repeat_regions.stateChanged.connect(change_choice_group) 
-
 
 # при изменении чекбокса активирует кнопку создать
 my_win.checkBox.stateChanged.connect(button_title_made_enable)
@@ -17013,17 +16995,12 @@ my_win.checkBox_visible_game.stateChanged.connect(change_status_visible_and_scor
 my_win.checkBox_6.stateChanged.connect(del_player_table)
 my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке игрок 1 группа
 my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке игрок 2 группа
-# my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке игрок 1 пф
-# my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке игрок 2 пф
-# my_win.checkBox_12.stateChanged.connect(no_play)  # поражение по неявке игрок 1 финал
-# my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по неявке игрок 2 финал
+
 my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
 my_win.checkBox_double.stateChanged.connect(page_double)
 my_win.checkBox_no_play_3.stateChanged.connect(mesto_3_no_play)
-# my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
-# my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
 
 
@@ -17049,7 +17026,7 @@ my_win.Button_Ok.clicked.connect(enter_score) # кнопка ввода счет
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
