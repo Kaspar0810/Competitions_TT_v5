@@ -2815,7 +2815,10 @@ def add_player():
     if pl_id == "": # добавляет нового игрока
         flag = check_repeat_player(pl, bd) # проверка повторного ввода игрока
     else:
-        player = Player.select().where(Player.id == pl_id).get()
+        if txt == "Редактировать":
+            player = Player.select().where(Player.id == pl_id).get()
+        else:
+            player = Delete_player.select().where(Delete_player.id == pl_id).get()
         pay_R = player.pay_rejting
         comment = player.comment
 
@@ -2862,21 +2865,24 @@ def add_player():
     else:  # просто редактирует игрока
         if txt == "Редактировать":
             # редактирует фамилии тренеров
+            bd_new = format_date_for_db(str_date=bd)
             Coach.update(coach = ch).where(Coach.id == idc).execute()
-            Player.update(coach_id = idc).where(Player.id == pl_id).execute()
-            with db:
-                plr =  player_list.select().where(Player.id == pl_id).get()
-                plr.player = pl                
-                bd_new = format_date_for_db(str_date=bd)
-                plr.bday = bd_new
-                plr.rank = rn
-                plr.city = ct
-                plr.region = rg
-                plr.razryad = rz
-                plr.full_name = fn
-                plr.pay_rejting = pay_R
-                plr.comment = comment
-                plr.save()
+            Player.update(player=pl, bday=bd_new, rank=rn, city = ct, region = rg, razryad = rz,
+                            full_name=fn, pay_rejting=pay_R, comment=comment, coach_id = idc).where(Player.id == pl_id).execute()
+
+            # with db:
+            #     plr =  player_list.select().where(Player.id == pl_id).get()
+            #     plr.player = pl                
+            #     bd_new = format_date_for_db(str_date=bd)
+            #     plr.bday = bd_new
+            #     plr.rank = rn
+            #     plr.city = ct
+            #     plr.region = rg
+            #     plr.razryad = rz
+            #     plr.full_name = fn
+            #     plr.pay_rejting = pay_R
+            #     plr.comment = comment
+            #     plr.save()
         elif txt == "Добавить":
             debt = "долг" if txt_edit == "Спортсмену необходимо оплатить рейтинг!" else ""
             # ==  перевод даты рождения в вид для db
@@ -2944,6 +2950,7 @@ def add_player():
     count = len(player_list)  # подсчитывает новое кол-во игроков
     my_win.label_46.setText(f"Всего: {count} участников")
     list_player_pdf(player_list)
+    my_win.lineEdit_id.clear()
     my_win.lineEdit_Family_name.clear()
     my_win.lineEdit_bday.clear()
     my_win.lineEdit_R.clear()
@@ -5404,9 +5411,10 @@ def select_player_in_list():
         col_num = idx.column()
         data = my_win.tableView.model().index(row_num, col_num).data()
         data_list.append(data)
-# ================================
+
     pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
     data_list.insert(0, pl_id)
+
     my_win.lineEdit_id.setText(data_list[0])
     my_win.lineEdit_id.setEnabled(False)
     my_win.lineEdit_Family_name.setText(data_list[1])
@@ -5421,10 +5429,21 @@ def select_player_in_list():
     if my_win.checkBox_6.isChecked():  # отмечен флажок -удаленные-
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_add_edit_player.setText("Восстановить")
+        # =========== отображение отчества ===
+        delete_players = Delete_player.get(Delete_player.id == int(pl_id))
+        otc_id = delete_players.patronymic_id        
+        # =====
     else:
         my_win.Button_del_player.setEnabled(True)
         my_win.Button_add_edit_player.setEnabled(True)
         my_win.Button_add_edit_player.setText("Редактировать")
+        # =========== отображение отчества ===
+        players = Player.get(Player.id == int(pl_id))
+        otc_id = players.patronymic_id        
+        # =====
+    otchestvo = Patronymic.get(Patronymic.id == otc_id)
+    otc = otchestvo.patronymic
+    my_win.lineEdit_otchestvo.setText(otc)
     if my_win.checkBox_11.isChecked():  # отмечен флажок -оплата R-
         my_win.Button_pay_R.setEnabled(True)
     else:
@@ -5568,6 +5587,7 @@ def delete_player():
     player = Player.select().where(Player.id == player_id).get()
     pay_R = player.pay_rejting
     comment = player.comment
+    patronymic_id = player.patronymic_id
 
     question = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
@@ -5647,11 +5667,10 @@ def delete_player():
             # записывает в таблицу -Delete player-
             birthday_mod = format_date_for_db(str_date=birthday)
             with db: 
-                del_player = Delete_player(player_del_id=player_id, bday=birthday_mod, rank=rank, city=player_city_del,
+                del_player = Delete_player(bday=birthday_mod, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
-                                            player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
-            # choices = Choice.get(Choice.player_choice_id == player_id)
-            # choices.delete_instance()
+                                            player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment, patronymic_id=patronymic_id).save()
+ 
         pl_del = Player.get(Player.id == player_id)
         pl_del.delete_instance() # удаляет игрока из таблицы -PLayer-
 
@@ -5661,6 +5680,7 @@ def delete_player():
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
+        my_win.lineEdit_otchestvo.clear()
         player_list_pred = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
         count = len(player_list_pred)    
         my_win.label_predzayavka.setText(f"По предзаявке {count} чел.")
@@ -16837,43 +16857,44 @@ def add_double_player_to_list():
 #     print("Все записи обновлены")
 # =======        
 # def proba():
-    # myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
-    # создать таблицу
+#     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
+#     # создать таблицу
     
-    # class Patronymic(BaseModel):
-    #     patronymic = CharField(45)
-    #     sex = CharField(45)
+#     # class Patronymic(BaseModel):
+#     #     patronymic = CharField(45)
+#     #     sex = CharField(45)
 
-    #     class Meta:
-    #         db_table = "patronymic"
-    #         order_by = "patronymic"
-    #     # db.connect()
-    #     db.create_tables([Patronymic], safe=True)
-    #     db.close()
+#     #     class Meta:
+#     #         db_table = "patronymic"
+#     #         order_by = "patronymic"
+#     #     # db.connect()
+#     #     db.create_tables([Patronymic], safe=True)
+#     #     db.close()
  
-# #creating the cursor object 
-#     cur = myconn.cursor() 
-#     try: 
-#         #adding a column branch name to the table Employee 
-#         cur.execute("ALTER TABLE Game_list MODIFY COLUMN player_group_id VARCHAR(30) NULL;") 
-#     except: 
-#         myconn.rollback() 
+# # #creating the cursor object 
+# #     cur = myconn.cursor() 
+# #     try: 
+# #         #adding a column branch name to the table Employee 
+# #         cur.execute("ALTER TABLE Game_list MODIFY COLUMN player_group_id VARCHAR(30) NULL;") 
+# #     except: 
+# #         myconn.rollback() 
     
-#     myconn.close() 
+# #     myconn.close() 
 
 
-    # migrator = MySQLMigrator(db)
-    # # no_game = TextField(default="")
-    # patronymic_id = ForeignKeyField(Player, field=Patronymic.id, null=True)  # новый столбец, его поле и значение по умолчанию
+#     migrator = MySQLMigrator(db)
+#     # # no_game = TextField(default="")
+#     patronymic_id = IntegerField(Delete_player)  # новый столбец, его поле и значение по умолчанию
     
-    # # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
+#     # # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
 
-    # # with db:
-    # #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
-    # #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-    # #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-    # migrate(migrator.add_column('players', 'patronymic_id', patronymic_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#     # # with db:
+#     # #     # migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
+#     # #     # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#     # #     # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
+#     migrate(migrator.add_column('delete_players', 'patronymic_id', patronymic_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -17026,7 +17047,7 @@ my_win.Button_Ok.clicked.connect(enter_score) # кнопка ввода счет
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)

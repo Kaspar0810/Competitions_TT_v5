@@ -198,10 +198,11 @@ class Delete_player(BaseModel):
     razryad = CharField(10)
     coach_id = ForeignKeyField(Coach)
     full_name = CharField()
-    player_del = ForeignKeyField(Player)
+    # player_del = ForeignKeyField(Player)
     title_id = ForeignKeyField(Title)
     pay_rejting = CharField(50)
     comment = CharField()
+    patronymic_id = IntegerField()
 
     class Meta:
         db_table = "delete_players"
