@@ -4223,9 +4223,9 @@ def list_player_pdf(player_list):
     elements.insert(0, ["№", "ФИО", "Дата рожд.", "R", "Город", "Субъект РФ", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-            colWidths=(0.8 * cm, 4.4 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.6 * cm, 1.0 * cm),
-            rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
-            #   rowHeights=(0.35 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+            colWidths=(0.8 * cm, 5.0 * cm, 1.6 * cm, 0.8 * cm, 2.5 * cm, 3.2 * cm, 1.1 * cm, 4.0 * cm, 1.0 * cm),
+            # rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+              rowHeights=(0.45 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
@@ -10946,8 +10946,9 @@ def func_zagolovok(canvas, doc):
         # nz = f"{strline1}\n{strline2}"
         canvas.drawCentredString(width / 2.0, height - 1.1 * cm, strline1)
         canvas.drawCentredString(width / 2.0, height - 1.5 * cm, strline2)
-        canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
         canvas.setFont("DejaVuSerif-Italic", 11)
+        canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
+        canvas.setFont("DejaVuSerif-Italic", 10)
     else:
         canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
         canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
